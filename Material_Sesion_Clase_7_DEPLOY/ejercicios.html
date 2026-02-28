@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ejercicios — Sesión 7 (Deploy en Render)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">Sesión 7 — Deploy en Render</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="clase.html">Guía Docente</a></li>
+          <li class="nav-item"><a class="nav-link active" href="ejercicios.html">Ejercicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rápido</a></li>
+          <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero py-4">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <div class="brand-pill">Guía de ejercicios</div>
+          <h1 class="h2 fw-bold mt-2 mb-1">De localhost a internet: paso a paso</h1>
+          <div class="small-muted" style="color:#a7f3d0">Meta: tu app funcionando con una URL pública en Render.</div>
+        </div>
+        <a class="btn btn-primary" href="entregable_equipo.html">Ir al entregable</a>
+      </div>
+      <div class="mt-3">
+        <a class="btn btn-outline-light btn-sm" href="index.html#diagramas">Ver diagramas</a>
+        <a class="btn btn-outline-light btn-sm" href="index.html#quiz">Ir al quiz</a>
+        <a class="btn btn-outline-light btn-sm" href="cheatsheet.html">Resumen rápido</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <div class="callout mb-3">
+      <div class="fw-semibold">Cómo usar estos ejercicios</div>
+      <div class="small-muted mt-2">Sigue cada paso en orden. Escribe una frase de "por qué" antes de continuar al siguiente. No saltes pasos.</div>
+    </div>
+
+    <div class="hotspot-panel mb-3">
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Primero verifica que tu app corre en localhost."></span>
+        <span class="hotspot-label">Verificar antes de deployar</span>
+      </div>
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Cada push dispara un re-deploy automático."></span>
+        <span class="hotspot-label">Push = Deploy</span>
+      </div>
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Leer el log es la habilidad más importante."></span>
+        <span class="hotspot-label">Aprender a leer logs</span>
+      </div>
+    </div>
+
+    <div class="row g-3">
+
+      <!-- Ejercicio 1 -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 1 — Verificar localhost</h2>
+            <p class="small-muted">Antes de publicar, tu app debe funcionar localmente.</p>
+            <ol>
+              <li>Abre tu terminal en la carpeta del proyecto.</li>
+              <li>Ejecuta: <code>./mvnw spring-boot:run</code></li>
+              <li>Abre <code>http://localhost:8080</code> en el navegador.</li>
+              <li>Verifica que puedas listar, crear y ver registros.</li>
+            </ol>
+            <div class="callout warning">
+              <div class="fw-semibold">Si no funciona aquí, NO sigas</div>
+              <div class="small-muted mt-2">Resuelve los errores locales primero. Deploy no arregla bugs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 2 -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 2 — Crear system.properties</h2>
+            <p class="small-muted">Este archivo le dice a Render qué versión de Java usar.</p>
+            <ol>
+              <li>En la <strong>raíz del proyecto</strong> (junto a pom.xml), crea un archivo nuevo.</li>
+              <li>Nombre: <code>system.properties</code></li>
+              <li>Contenido (una sola línea):</li>
+            </ol>
+            <pre><code class="language-properties">java.runtime.version=17</code></pre>
+            <details>
+              <summary class="fw-semibold">¿Por qué esto es necesario?</summary>
+              <div class="mt-2 small-muted">Render no sabe qué versión de Java necesitas. Sin este archivo, podría usar Java 8 y tu app (que requiere Java 17) no compilará.</div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 3 -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 3 — Ajustar application.properties</h2>
+            <p class="small-muted">Configura tu app para que funcione tanto local como en Render.</p>
+            <pre><code class="language-properties"># Puerto dinámico (Render asigna su propio puerto)
+server.port=${PORT:8080}
+
+# Base de datos H2 en memoria (producción simple)
+spring.datasource.url=jdbc:h2:mem:proddb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+# Consola H2 (útil para verificar datos)
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.h2.console.settings.web-allow-others=true</code></pre>
+            <details>
+              <summary class="fw-semibold">¿Qué significa ${PORT:8080}?</summary>
+              <div class="mt-2 small-muted">Lee la variable de entorno PORT. Si existe (en Render), la usa. Si no (en tu PC local), usa 8080 como respaldo. Es una configuración "dos en uno".</div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 4 -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 4 — Verificar .gitignore</h2>
+            <p class="small-muted">Asegúrate de NO subir archivos innecesarios.</p>
+            <pre><code class="language-bash"># Tu .gitignore debe incluir al menos:
+target/
+*.class
+*.jar
+*.log
+.idea/
+*.iml
+.DS_Store
+*.mv.db
+*.trace.db</code></pre>
+            <div class="callout">
+              <strong>¿Por qué?</strong> La carpeta <code>target/</code> contiene archivos compilados que Render genera él mismo. Subirlos desperdiciaría espacio y podría causar conflictos.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 5 -->
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 5 — Git: add, commit, push</h2>
+            <p class="small-muted">Los 3 comandos más importantes para publicar cambios.</p>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <h6 class="fw-bold">Paso 1: Ver estado</h6>
+                <pre><code class="language-bash">git status</code></pre>
+                <p class="small-muted">Escribe qué archivos aparecen en rojo o verde:</p>
+                <textarea class="form-control" rows="2" placeholder="Ej: system.properties (nuevo), application.properties (modificado)"></textarea>
+              </div>
+              <div class="col-md-4">
+                <h6 class="fw-bold">Paso 2: Agregar y commitear</h6>
+                <pre><code class="language-bash">git add .
+git commit -m "Preparar proyecto para deploy en Render"</code></pre>
+                <p class="small-muted">Escribe tu propio mensaje de commit:</p>
+                <input class="form-control" placeholder="Tu mensaje descriptivo..." />
+              </div>
+              <div class="col-md-4">
+                <h6 class="fw-bold">Paso 3: Push</h6>
+                <pre><code class="language-bash">git push origin main</code></pre>
+                <p class="small-muted">¿Qué mensaje viste al final?</p>
+                <textarea class="form-control" rows="2" placeholder="Ej: main -> main (success)"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 6 -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 6 — Crear cuenta en Render</h2>
+            <ol>
+              <li>Abrir <strong>render.com</strong></li>
+              <li>Click <strong>"Get Started for Free"</strong></li>
+              <li>Seleccionar <strong>"Continue with GitHub"</strong></li>
+              <li>Autorizar acceso a tus repositorios</li>
+              <li>Verificar tu correo electrónico</li>
+            </ol>
+            <div class="callout success">
+              <strong>Evidencia:</strong> Captura de pantalla de tu Dashboard de Render.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 7 -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 7 — Crear Web Service</h2>
+            <ol>
+              <li><strong>New +</strong> → <strong>Web Service</strong></li>
+              <li><strong>Build and deploy from a Git repository</strong></li>
+              <li>Conectar tu repositorio</li>
+              <li>Verificar que detecta "Java" como runtime</li>
+              <li>Configurar:
+                <ul>
+                  <li>Name: <em>(nombre de tu app)</em></li>
+                  <li>Branch: <code>main</code></li>
+                  <li>Build: <code>./mvnw clean install -DskipTests</code></li>
+                  <li>Start: <code>java -jar target/*.jar</code></li>
+                  <li>Plan: <strong>Free</strong></li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 8 -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 8 — Variable de entorno</h2>
+            <p class="small-muted">La memoria es limitada en el plan gratuito.</p>
+            <ol>
+              <li>En tu Web Service → pestaña <strong>"Environment"</strong></li>
+              <li>Agregar variable:
+                <ul>
+                  <li>Key: <code>JAVA_TOOL_OPTIONS</code></li>
+                  <li>Value: <code>-Xmx256m</code></li>
+                </ul>
+              </li>
+              <li>Click <strong>"Save Changes"</strong></li>
+            </ol>
+            <details>
+              <summary class="fw-semibold">¿Qué es -Xmx256m?</summary>
+              <div class="mt-2 small-muted">Le dice a Java: "no uses más de 256 megabytes de memoria". Como el plan gratis tiene 512 MB, dejamos espacio para el sistema operativo.</div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 9 -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 9 — Leer los logs del build</h2>
+            <p class="small-muted">Mientras Render construye tu app, aparecen logs en tiempo real.</p>
+            <ol>
+              <li>Observa la pestaña <strong>"Logs"</strong> en Render.</li>
+              <li>Busca estas líneas clave:
+                <ul>
+                  <li><code>BUILD SUCCESS</code> → la compilación funcionó</li>
+                  <li><code>Started Application in X seconds</code> → la app arrancó</li>
+                </ul>
+              </li>
+              <li>Si ves <code class="text-danger">ERROR</code>, anota el mensaje exacto.</li>
+            </ol>
+            <div class="callout">
+              <strong>Actividad:</strong> Escribe las 3 líneas más importantes que encontraste en los logs:
+            </div>
+            <textarea class="form-control mt-2" rows="3" placeholder="1. ...\n2. ...\n3. ..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio 10 -->
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ejercicio 10 — Verificar URL pública + Re-deploy</h2>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <h6 class="fw-bold">Parte A: Verificar</h6>
+                <ol>
+                  <li>Cuando Render muestre <span class="status-badge live">● Live</span>, copia la URL.</li>
+                  <li>Abre la URL en tu navegador.</li>
+                  <li>Abre la URL en tu celular.</li>
+                  <li>Crea un registro nuevo desde el celular.</li>
+                </ol>
+                <label class="form-label fw-bold mt-2">Tu URL pública:</label>
+                <input class="form-control" placeholder="https://mi-app.onrender.com" />
+              </div>
+              <div class="col-md-6">
+                <h6 class="fw-bold">Parte B: Re-deploy</h6>
+                <ol>
+                  <li>Haz un cambio pequeño en tu código (ej: cambiar un título).</li>
+                  <li>Ejecuta:
+                    <pre><code class="language-bash">git add .
+git commit -m "Cambiar título para probar re-deploy"
+git push origin main</code></pre>
+                  </li>
+                  <li>Abre Render → observa que el build arranca solo.</li>
+                  <li>Espera a que termine → verifica el cambio en la URL.</li>
+                </ol>
+                <div class="callout success">
+                  <strong>¡Lo lograste!</strong> Si el cambio se ve en la URL, dominas el ciclo completo de deploy.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejercicio BONUS: Cron para evitar cold start -->
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h5 section-title">🎁 Bonus — Evitar el "cold start" con cron-job.org</h2>
+            <div class="callout">
+              <strong>¿Sabías?</strong> El plan gratuito de Render apaga (spin down) tu app después de <strong>15 minutos</strong> sin recibir <strong>tráfico entrante (inbound HTTP)</strong>. Render monitorea las peticiones que llegan desde fuera a nivel de load-balancer — <strong>no la actividad interna del proceso</strong>. Un <code>@Scheduled</code> de Spring o un hilo background dentro de la app <strong>no cuenta</strong> como actividad y <strong>no evita</strong> el spin-down. La primera visita posterior tarda <strong>30-60 segundos</strong> mientras la JVM arranca de nuevo.
+            </div>
+            <div class="callout" style="border-left-color:#ef4444">
+              <strong>⚠️ ¿Por qué no un cron interno?</strong> Si agregas <code>@Scheduled(fixedRate=840000)</code> en tu código Spring Boot, esa tarea se ejecuta <em>dentro</em> del mismo proceso. Render no ve eso como tráfico entrante — la app se dormirá igual. Necesitas un ping <strong>externo</strong>.
+            </div>
+            <h6 class="fw-bold mt-3">Workaround: Ping EXTERNO automático cada 14 minutos</h6>
+            <ol>
+              <li>Ve a <a href="https://cron-job.org" target="_blank" rel="noopener">cron-job.org</a> y crea una cuenta gratuita.</li>
+              <li>Haz clic en <strong>"Create Cronjob"</strong>.</li>
+              <li>En <strong>URL</strong>, pega tu URL de Render: <code>https://mi-app.onrender.com</code>.</li>
+              <li>En <strong>Execution schedule</strong>, elige <strong>"Every 14 minutes"</strong> (personalizado).</li>
+              <li>Guarda el cron job.</li>
+              <li>Verifica: espera 15+ minutos y abre tu app — debería cargar rápido (~2-5s en vez de ~60s).</li>
+            </ol>
+            <div class="callout success mt-2">
+              <strong>Resultado:</strong> cron-job.org hará un GET a tu URL cada 14 min, impidiendo que Render apague el contenedor. Tu app responde rápido 24/7 sin costo.
+            </div>
+            <label class="form-label fw-bold mt-3">¿Configuraste el cron? Pega la URL del cron job aquí:</label>
+            <input class="form-control" placeholder="https://cron-job.org/en/jobs/123456/" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="py-4 border-top bg-white">
+    <div class="container small-muted">Ejercicios — Sesión 7 · Entrega en <a href="entregable_equipo.html">entregable_equipo.html</a></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    tippy('[data-tippy-content]', { theme: 'light', maxWidth: 280 });
+  </script>
+</body>
+</html>

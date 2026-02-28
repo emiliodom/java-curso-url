@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guía Docente — Sesión 7 (Deploy en Render)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">Sesión 7 — Deploy en Render</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="clase.html">Guía Docente</a></li>
+          <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rápido</a></li>
+          <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero py-4">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <div class="brand-pill">Guía Docente</div>
+          <h1 class="h2 fw-bold mt-2 mb-1">Sesión de Clase 7 — Despliegue en Render</h1>
+          <div class="small-muted" style="color:#a7f3d0">Unidad 7: publicar la aplicación web en internet usando Render (gratuito).</div>
+        </div>
+        <a class="btn btn-outline-light" href="ejercicios.html">Abrir ejercicios</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-4">
+
+    <!-- Hotspot panel -->
+    <div class="hotspot-panel mb-3">
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Verifica que el estudiante pueda explicar cada comando de Git."></span>
+        <span class="hotspot-label">Comprensión de Git (add, commit, push)</span>
+      </div>
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="El estudiante debe saber qué archivos necesita Render."></span>
+        <span class="hotspot-label">Archivos de configuración para deploy</span>
+      </div>
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Capacidad de leer logs de build y diagnosticar errores."></span>
+        <span class="hotspot-label">Lectura de logs y troubleshooting</span>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <!-- Columna izquierda: Objetivos / Normas / Caso -->
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h5 section-title">Objetivos (hoy)</h2>
+            <ul class="mb-0">
+              <li>Preparar el proyecto Spring Boot para producción.</li>
+              <li>Ejecutar el flujo completo de Git: add → commit → push.</li>
+              <li>Configurar un Web Service en Render paso a paso.</li>
+              <li>Verificar que la app funcione con una URL pública.</li>
+              <li>Diagnosticar errores comunes de deploy.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Normas rápidas</h2>
+            <ul class="mb-0">
+              <li>No deploy sin commit descriptivo ("cambios" no vale).</li>
+              <li>Primero que funcione en localhost, luego deploy.</li>
+              <li>Todo error de build se resuelve leyendo el log.</li>
+              <li>El plan FREE se duerme — eso es normal.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Caso sugerido</h2>
+            <div class="small-muted">Continuar con el proyecto de la entidad sin fines de lucro.</div>
+            <ul class="mb-0 mt-2">
+              <li>Verificar que el CRUD funciona en localhost.</li>
+              <li>Crear system.properties.</li>
+              <li>Ajustar application.properties.</li>
+              <li>Deploy a Render → URL pública.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card mt-3 border-warning">
+          <div class="card-body">
+            <h2 class="h5 section-title">⚠️ Preparación previa</h2>
+            <p class="small-muted mb-2">Pedir a los estudiantes <strong>antes de la clase</strong>:</p>
+            <ol class="mb-0">
+              <li>Crear cuenta en <strong>render.com</strong> con su GitHub.</li>
+              <li>Verificar que su proyecto corre en localhost sin errores.</li>
+              <li>Tener Git instalado y configurado.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: Guión de clase -->
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h4 section-title">Guión sugerido (120–150 min)</h2>
+
+            <div class="accordion" id="acc">
+
+              <!-- 1. Activación -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="h1">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#c1">
+                    1) Activación (10 min) — "¿Tu app solo existe en tu computadora?"
+                  </button>
+                </h2>
+                <div id="c1" class="accordion-collapse collapse show" data-bs-parent="#acc">
+                  <div class="accordion-body">
+                    <ul>
+                      <li><strong>Pregunta detonadora:</strong> "Si tu computadora se apaga, ¿tu app desaparece?"</li>
+                      <li>Analogía: tu PC es tu cuaderno. Deploy es fotocopiar y poner el trabajo en un tablón público.</li>
+                      <li>Mostrar <a href="index.html#mapa">el mapa del deploy</a> en pantalla.</li>
+                      <li>Meta del día: <strong>que tu app tenga una URL pública que cualquiera pueda abrir.</strong></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Preparar archivos -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="h2">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
+                    2) Preparar el proyecto (20 min) — system.properties + application.properties
+                  </button>
+                </h2>
+                <div id="c2" class="accordion-collapse collapse" data-bs-parent="#acc">
+                  <div class="accordion-body">
+                    <ol>
+                      <li>Verificar que la app corre en <code>localhost:8080</code> sin errores.</li>
+                      <li>Crear <code>system.properties</code> en la raíz:
+                        <pre><code class="language-properties">java.runtime.version=17</code></pre>
+                      </li>
+                      <li>Ajustar <code>application.properties</code>:
+                        <pre><code class="language-properties">server.port=${PORT:8080}
+spring.datasource.url=jdbc:h2:mem:proddb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.h2.console.enabled=true
+spring.h2.console.settings.web-allow-others=true</code></pre>
+                      </li>
+                    </ol>
+                    <div class="callout warning">
+                      <div class="fw-semibold">Punto clave para explicar</div>
+                      <div class="small-muted mt-2"><code>${PORT:8080}</code> es como decir: "usa el puerto que Render te dé; si no hay, usa 8080". Es la misma idea que un respaldo.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Git add/commit/push -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="h3">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3">
+                    3) Git: add → commit → push (25 min) — Demo en vivo
+                  </button>
+                </h2>
+                <div id="c3" class="accordion-collapse collapse" data-bs-parent="#acc">
+                  <div class="accordion-body">
+                    <p><strong>Hacer la demo en la terminal real frente al grupo:</strong></p>
+                    <ol>
+                      <li><code>git status</code> — ver qué cambió.</li>
+                      <li><code>git add .</code> — agregar todo.</li>
+                      <li><code>git commit -m "Preparar proyecto para deploy en Render"</code></li>
+                      <li><code>git push origin main</code> — enviar a GitHub.</li>
+                    </ol>
+                    <div class="callout">
+                      <div class="fw-semibold">Actividad del estudiante</div>
+                      <div class="small-muted mt-2">Que cada equipo haga los mismos comandos en su terminal. Abrir <a href="index.html#terminal-sim">la terminal simulada</a> para los que no pueden ejecutar en vivo.</div>
+                    </div>
+                    <div class="callout warning mt-2">
+                      <div class="fw-semibold">Errores comunes aquí</div>
+                      <div class="small-muted mt-2">
+                        • "nothing to commit" → No hicieron <code>git add .</code><br>
+                        • "failed to push" → No tienen el remoto configurado (hacer <code>git remote -v</code>)<br>
+                        • "permission denied" → Token de GitHub expirado o no configurado
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Configurar Render -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="h4">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c4">
+                    4) Configurar Render (30 min) — Demo guiada
+                  </button>
+                </h2>
+                <div id="c4" class="accordion-collapse collapse" data-bs-parent="#acc">
+                  <div class="accordion-body">
+                    <p>Proyectar la pantalla y hacer la configuración en vivo:</p>
+                    <ol>
+                      <li>Abrir <strong>render.com</strong> → Dashboard.</li>
+                      <li><strong>New +</strong> → <strong>Web Service</strong>.</li>
+                      <li>Seleccionar repositorio de GitHub.</li>
+                      <li>Configurar:
+                        <ul>
+                          <li>Name: nombre-de-tu-app</li>
+                          <li>Branch: main</li>
+                          <li>Build: <code>./mvnw clean install -DskipTests</code></li>
+                          <li>Start: <code>java -jar target/*.jar</code></li>
+                          <li>Plan: <strong>Free</strong></li>
+                        </ul>
+                      </li>
+                      <li>Ir a Environment → agregar <code>JAVA_TOOL_OPTIONS=-Xmx256m</code></li>
+                      <li>Click <strong>"Create Web Service"</strong></li>
+                      <li>Esperar el build (3-8 min). Leer los logs juntos.</li>
+                    </ol>
+                    <div class="callout success mt-2">
+                      <div class="fw-semibold">Momento de celebración</div>
+                      <div class="small-muted mt-2">Cuando el status cambie a <span class="status-badge live">● Live</span>, pedir que abran la URL en su celular. Ese momento de "mi app funciona en mi teléfono" es poderoso pedagógicamente.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Equipos deployean -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="h5">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c5">
+                    5) Práctica en equipos (30–40 min) — Deploy propio
+                  </button>
+                </h2>
+                <div id="c5" class="accordion-collapse collapse" data-bs-parent="#acc">
+                  <div class="accordion-body">
+                    <ul>
+                      <li>Cada equipo replica el proceso con su propio proyecto.</li>
+                      <li>Usar el <a href="cheatsheet.html">cheatsheet</a> como referencia rápida.</li>
+                      <li>Si el build falla: revisar <a href="index.html#errores">la sección de errores</a> antes de llamar al docente.</li>
+                      <li>Registrar la URL pública en el <a href="entregable_equipo.html">entregable</a>.</li>
+                    </ul>
+                    <div class="callout warning">
+                      <div class="fw-semibold">No hacer por ellos</div>
+                      <div class="small-muted mt-2">Si un equipo tiene un error, primero que lean el log. Preguntar: "¿Qué dice el mensaje?" antes de intervenir. El objetivo es que aprendan a diagnosticar.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6. Re-deploy -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="h6">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c6">
+                    6) Re-deploy: cambio + push (10–15 min) — Comprobar el ciclo
+                  </button>
+                </h2>
+                <div id="c6" class="accordion-collapse collapse" data-bs-parent="#acc">
+                  <div class="accordion-body">
+                    <p>Hacer un cambio pequeño para demostrar el ciclo completo:</p>
+                    <ol>
+                      <li>Cambiar un texto en una vista (<code>lista.html</code> o similar).</li>
+                      <li><code>git add . → commit → push</code></li>
+                      <li>Abrir Render → ver que el build arranca automáticamente.</li>
+                      <li>Esperar a que termine → verificar el cambio en la URL pública.</li>
+                    </ol>
+                    <div class="callout success">
+                      <div class="fw-semibold">Mensaje clave</div>
+                      <div class="small-muted mt-2">"Cada push es un deploy. Así funciona el desarrollo web real. Cambias → subes → se actualiza."</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 7. Cierre -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="h7">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c7">
+                    7) Cierre y reflexión (10 min) — "Mi app está en internet"
+                  </button>
+                </h2>
+                <div id="c7" class="accordion-collapse collapse" data-bs-parent="#acc">
+                  <div class="accordion-body">
+                    <div class="callout success">
+                      <div class="fw-semibold">Ticket de salida</div>
+                      <div class="small-muted mt-2">Cada equipo comparte:<br>
+                        1. Su URL pública.<br>
+                        2. Un error que tuvieron y cómo lo resolvieron.<br>
+                        3. Una frase: "Deployar es como ______ porque ______."
+                      </div>
+                    </div>
+                    <div class="callout mt-2" style="border-left-color:#f59e0b">
+                      <div class="fw-semibold">⏰ Importante: Cold start (plan free)</div>
+                      <div class="small-muted mt-2">Render apaga la app tras 15 min sin <strong>tráfico entrante (inbound HTTP)</strong>. Render mide solo peticiones externas a nivel de load-balancer, <strong>no</strong> la actividad interna del proceso. La primera petición posterior tarda 30-60 s. Explique que <strong>no es un error</strong>.<br><br>
+                        <strong>Pregunta frecuente de alumnos:</strong> "¿Y si pongo un <code>@Scheduled</code> en Spring?" → No funciona, porque Render no lo detecta como tráfico entrante. El ping debe venir <strong>de afuera</strong>.<br><br>
+                        <strong>Workaround gratuito:</strong> Crear un cron <strong>externo</strong> en <a href="https://cron-job.org" target="_blank">cron-job.org</a> que haga ping HTTP cada 14 minutos a la URL de Render → la app nunca se duerme.<br>
+                        Si hay tiempo, pida a un equipo que lo configure en vivo como demo.
+                      </div>
+                    </div>
+                    <div class="callout mt-2">
+                      <div class="fw-semibold">Adelanto Semana 8</div>
+                      <div class="small-muted mt-2">La próxima semana veremos seguridad, QA y cómo hacer cambios en producción sin romper nada (redeploy seguro).</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="py-4 border-top bg-white">
+    <div class="container small-muted">Guía Docente — Sesión 7 · Vuelve a <a href="index.html">inicio</a></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    tippy('[data-tippy-content]', { theme: 'light', maxWidth: 280 });
+  </script>
+</body>
+</html>

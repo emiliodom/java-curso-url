@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Semana 7 — Despliegue (Deploy) en Render (Guía Interactiva)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">Sesión 7 — Deploy en Render</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="clase.html">Guía Docente</a></li>
+          <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rápido</a></li>
+          <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container py-5">
+      <p class="eyebrow">Semana 7 · Despliegue de la aplicación web</p>
+      <h1>Tu app en internet: Deploy paso a paso</h1>
+      <p class="lead">Guía interactiva para publicar tu proyecto Spring Boot en Render (gratis). Desde el commit hasta la URL pública.</p>
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-primary" href="#mapa">Mapa del deploy</a>
+        <a class="btn btn-outline-light" href="#requisitos">Requisitos</a>
+        <a class="btn btn-outline-light" href="#git-push">Git + Push</a>
+        <a class="btn btn-outline-light" href="#render-config">Configurar Render</a>
+        <a class="btn btn-outline-light" href="#terminal-sim">Terminal simulada</a>
+        <a class="btn btn-outline-light" href="#diagramas">Diagramas</a>
+        <a class="btn btn-outline-light" href="#quiz">Quiz</a>
+        <a class="btn btn-outline-light" href="#checklist">Checklist</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== SECCIÓN 1: MAPA DEL DEPLOY ===================== -->
+    <section class="section" id="mapa">
+      <div class="container">
+        <div class="section-title">
+          <h2>¿Qué significa "deploy"?</h2>
+          <p>Deploy = publicar. Es como imprimir un documento y ponerlo en un tablón público. Tu app pasa de funcionar solo en tu computadora a estar disponible para cualquier persona con internet.</p>
+        </div>
+
+        <div class="callout mb-4">
+          <strong>Analogía clave:</strong> Tu computadora es como tu cuaderno personal. Render es el tablón de anuncios de la escuela: todos pueden ver lo que publicas ahí.
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-4 col-lg-2">
+            <div class="deploy-step text-center">
+              <span class="step-num">1</span>
+              <h3 class="h6 mt-4">Código listo</h3>
+              <p class="small-muted">Tu app funciona en localhost</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="deploy-step text-center">
+              <span class="step-num">2</span>
+              <h3 class="h6 mt-4">Commit</h3>
+              <p class="small-muted">Guardas cambios con Git</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="deploy-step text-center">
+              <span class="step-num">3</span>
+              <h3 class="h6 mt-4">Push</h3>
+              <p class="small-muted">Subes a GitHub</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="deploy-step text-center">
+              <span class="step-num">4</span>
+              <h3 class="h6 mt-4">Render detecta</h3>
+              <p class="small-muted">Lee tu repo automáticamente</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="deploy-step text-center">
+              <span class="step-num">5</span>
+              <h3 class="h6 mt-4">Build</h3>
+              <p class="small-muted">Compila tu proyecto</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="deploy-step text-center">
+              <span class="step-num">6</span>
+              <h3 class="h6 mt-4">¡En vivo!</h3>
+              <p class="small-muted">URL pública activa</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout success mt-4">
+          <strong>Frase para recordar:</strong> "Commit → Push → Render detecta → Build → ¡Tu app está viva!"
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 2: REQUISITOS PREVIOS ===================== -->
+    <section class="section section-alt" id="requisitos">
+      <div class="container">
+        <div class="section-title">
+          <h2>Requisitos antes de deployar</h2>
+          <p>Antes de publicar, tu proyecto necesita cumplir ciertas condiciones. Es como preparar la maleta antes de un viaje.</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>✅ Checklist pre-deploy</h3>
+              <ul>
+                <li><strong>Git inicializado</strong> — tu proyecto tiene un repositorio Git</li>
+                <li><strong>Repositorio en GitHub</strong> — todo tu código está subido</li>
+                <li><strong>La app corre en localhost</strong> — sin errores al arrancar</li>
+                <li><strong>Cuenta en Render</strong> — gratuita con GitHub</li>
+                <li><strong>Archivo <code>system.properties</code></strong> — indica la versión de Java</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>📁 Archivos que Render necesita</h3>
+              <div class="file-tree">
+                <span class="folder">📂 mi-proyecto/</span><br>
+                ├── <span class="highlight">pom.xml</span> ← Render lo detecta automáticamente<br>
+                ├── <span class="highlight">system.properties</span> ← Versión de Java<br>
+                ├── <span class="folder">📂 src/</span><br>
+                │   └── <span class="folder">📂 main/</span><br>
+                │       ├── <span class="folder">📂 java/</span> (tu código)<br>
+                │       └── <span class="folder">📂 resources/</span><br>
+                │           ├── <span class="file">application.properties</span><br>
+                │           └── <span class="folder">📂 templates/</span><br>
+                └── <span class="file">.gitignore</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>🔧 system.properties</h3>
+              <p>Este archivo le dice a Render qué versión de Java usar. Créalo en la raíz del proyecto:</p>
+              <pre><code class="language-properties">java.runtime.version=17</code></pre>
+              <div class="callout warning">
+                <strong>¡Importante!</strong> Sin este archivo, Render puede usar Java 8 y tu app no arrancará.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>⚙️ application.properties (para deploy)</h3>
+              <p>Ajustes mínimos para que funcione en Render:</p>
+              <pre><code class="language-properties"># Puerto que Render asigna
+server.port=${PORT:8080}
+
+# H2 en memoria para producción simple
+spring.datasource.url=jdbc:h2:mem:proddb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+# H2 Console (desactivar en producción real)
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.h2.console.settings.web-allow-others=true</code></pre>
+              <div class="callout">
+                <strong>¿Por qué <code>${PORT:8080}</code>?</strong> Render asigna un puerto dinámico. Con esta línea, tu app usa el puerto de Render si existe, o 8080 si corres local.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 3: GIT + PUSH ===================== -->
+    <section class="section" id="git-push">
+      <div class="container">
+        <div class="section-title">
+          <h2>Git: Commit y Push (la base del deploy)</h2>
+          <p>Render lee tu código directamente de GitHub. Si no haces push, Render no ve los cambios. Es como enviar una carta: si no la echas al buzón, no llega.</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Paso 1 — Verificar estado</h3>
+              <div class="terminal-sim">
+                <span class="comment"># ¿Qué archivos cambiaron?</span><br>
+                <span class="prompt">$</span> git status<br><br>
+                <span class="output">On branch main</span><br>
+                <span class="output">Changes not staged for commit:</span><br>
+                <span class="output">  modified:   src/.../application.properties</span><br>
+                <span class="output">Untracked files:</span><br>
+                <span class="error">  system.properties</span>
+              </div>
+              <p class="small-muted mt-2">Los archivos en rojo son nuevos. Los modificados necesitan agregarse.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Paso 2 — Agregar y hacer commit</h3>
+              <div class="terminal-sim">
+                <span class="comment"># Agregar TODOS los cambios</span><br>
+                <span class="prompt">$</span> git add .<br><br>
+                <span class="comment"># Crear el commit con mensaje descriptivo</span><br>
+                <span class="prompt">$</span> git commit -m "Preparar proyecto para deploy en Render"<br><br>
+                <span class="success">[main abc1234] Preparar proyecto para deploy en Render</span><br>
+                <span class="output"> 3 files changed, 12 insertions(+)</span>
+              </div>
+              <div class="callout mt-2">
+                <strong>Regla de oro:</strong> Cada commit debe tener un mensaje claro. "cambios" no sirve. "Agregar system.properties para Java 17" sí.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Paso 3 — Push a GitHub</h3>
+              <div class="terminal-sim">
+                <span class="comment"># Enviar cambios a GitHub</span><br>
+                <span class="prompt">$</span> git push origin main<br><br>
+                <span class="output">Enumerating objects: 5, done.</span><br>
+                <span class="output">Counting objects: 100% (5/5), done.</span><br>
+                <span class="success">To github.com:tu-usuario/tu-proyecto.git</span><br>
+                <span class="success">   abc1234..def5678  main -> main</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Flujo resumido</h3>
+              <div class="terminal-sim">
+                <span class="comment"># Los 3 comandos esenciales del deploy</span><br>
+                <span class="prompt">$</span> git add .<br>
+                <span class="prompt">$</span> git commit -m "Descripción del cambio"<br>
+                <span class="prompt">$</span> git push origin main<br><br>
+                <span class="success"># ¡Listo! Render detecta el push automáticamente</span>
+              </div>
+              <div class="callout success mt-2">
+                <strong>Automatización:</strong> Cada vez que haces push, Render re-deploya tu app automáticamente. ¡No tienes que hacer nada más!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 4: RENDER CONFIG ===================== -->
+    <section class="section section-alt" id="render-config">
+      <div class="container">
+        <div class="section-title">
+          <h2>Configurar Render paso a paso</h2>
+          <p>Render es como un "horno" donde metes tu código y sale una app en internet. Solo necesitas conectar tu GitHub y configurar unas pocas cosas.</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>1. Crear cuenta en Render</h3>
+              <ol>
+                <li>Ir a <strong>render.com</strong></li>
+                <li>Click en <strong>"Get Started for Free"</strong></li>
+                <li>Seleccionar <strong>"Sign in with GitHub"</strong></li>
+                <li>Autorizar el acceso a tus repositorios</li>
+              </ol>
+              <div class="callout">
+                <strong>¿Por qué Render?</strong> Es gratuito, no pide tarjeta de crédito, y se conecta directo a GitHub. Ideal para proyectos educativos.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>2. Crear un Web Service</h3>
+              <ol>
+                <li>En el Dashboard, click <strong>"New +"</strong> → <strong>"Web Service"</strong></li>
+                <li>Seleccionar <strong>"Build and deploy from a Git repository"</strong></li>
+                <li>Conectar tu repositorio de GitHub</li>
+                <li>Render detecta que es un proyecto Java/Maven</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="col-lg-12">
+            <div class="info-card">
+              <h3>3. Configuración del servicio</h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <table class="table table-sm">
+                    <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
+                    <tbody>
+                      <tr><td><strong>Name</strong></td><td>mi-app-recursos (el nombre que quieras)</td></tr>
+                      <tr><td><strong>Region</strong></td><td>Oregon (US West) — el más cercano gratis</td></tr>
+                      <tr><td><strong>Branch</strong></td><td>main</td></tr>
+                      <tr><td><strong>Runtime</strong></td><td>Java (detectado automáticamente)</td></tr>
+                      <tr><td><strong>Build Command</strong></td><td><code>./mvnw clean install -DskipTests</code></td></tr>
+                      <tr><td><strong>Start Command</strong></td><td><code>java -jar target/*.jar</code></td></tr>
+                      <tr><td><strong>Plan</strong></td><td><strong>Free</strong></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <div class="callout warning">
+                    <strong>Build Command explicado:</strong>
+                    <ul class="mb-0 mt-1">
+                      <li><code>./mvnw</code> — usa el Maven que viene con el proyecto</li>
+                      <li><code>clean install</code> — limpia y compila todo</li>
+                      <li><code>-DskipTests</code> — salta pruebas para ir más rápido</li>
+                    </ul>
+                  </div>
+                  <div class="callout mt-2">
+                    <strong>Start Command explicado:</strong>
+                    <ul class="mb-0 mt-1">
+                      <li><code>java -jar target/*.jar</code> — ejecuta el .jar generado</li>
+                      <li>Es como hacer doble clic para abrir un programa</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>4. Variables de entorno</h3>
+              <p>En la sección <strong>"Environment"</strong> de Render:</p>
+              <table class="table table-sm">
+                <thead><tr><th>Key</th><th>Value</th></tr></thead>
+                <tbody>
+                  <tr><td><code>JAVA_TOOL_OPTIONS</code></td><td><code>-Xmx256m</code></td></tr>
+                </tbody>
+              </table>
+              <div class="callout warning">
+                <strong>¿Por qué <code>-Xmx256m</code>?</strong> El plan gratuito de Render tiene memoria limitada (512 MB). Con esto le decimos a Java que no use más de 256 MB.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>5. Deploy y URL pública</h3>
+              <ol>
+                <li>Click <strong>"Create Web Service"</strong></li>
+                <li>Render empieza a construir (Build) — tarda 3-8 minutos</li>
+                <li>Cuando el status sea <span class="status-badge live">● Live</span> → ¡tu app está en internet!</li>
+                <li>Tu URL será: <code>https://mi-app-recursos.onrender.com</code></li>
+              </ol>
+              <div class="callout success">
+                <strong>¡Momento mágico!</strong> Copia la URL y ábrela en tu celular. Tu app funciona desde cualquier dispositivo con internet.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 5: TERMINAL SIMULADA ===================== -->
+    <section class="section" id="terminal-sim">
+      <div class="container">
+        <div class="section-title">
+          <h2>Terminal interactiva: practica los comandos</h2>
+          <p>Escribe los comandos Git en orden y observa qué pasa en cada paso.</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body p-0">
+                <div style="background:#1e293b;padding:0.5rem 1rem;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:0.5rem">
+                  <span style="width:12px;height:12px;border-radius:50%;background:#ef4444"></span>
+                  <span style="width:12px;height:12px;border-radius:50%;background:#f59e0b"></span>
+                  <span style="width:12px;height:12px;border-radius:50%;background:#10b981"></span>
+                  <span class="small-muted ms-2" style="color:#94a3b8">Terminal — Deploy Simulator</span>
+                </div>
+                <div id="terminalOutput" class="terminal-sim" style="min-height:260px;border-radius:0 0 12px 12px;margin:0">
+                  <span class="comment"># Escribe los comandos en el campo de abajo</span><br>
+                  <span class="comment"># Comandos válidos: git status, git add ., git commit -m "...", git push origin main</span><br>
+                  <span class="prompt">~/mi-proyecto $</span> <span id="cursor" class="success">▊</span>
+                </div>
+                <div class="p-3 bg-white" style="border-radius:0 0 12px 12px">
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark text-success border-dark">$</span>
+                    <input type="text" id="terminalInput" class="form-control" placeholder="Escribe un comando..." autocomplete="off">
+                    <button class="btn btn-primary" onclick="runCommand()">Ejecutar</button>
+                  </div>
+                  <div class="d-flex gap-2 mt-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="quickCmd('git status')">git status</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="quickCmd('git add .')">git add .</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="quickCmd('git commit -m &quot;deploy ready&quot;')">git commit</button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="quickCmd('git push origin main')">git push</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="resetTerminal()">Reiniciar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="info-card">
+              <h3>Estado del deploy</h3>
+              <div id="deployStatus">
+                <div class="mb-2">
+                  <span class="small-muted">Git status:</span>
+                  <span id="statusGit" class="status-badge failed">● Sin verificar</span>
+                </div>
+                <div class="mb-2">
+                  <span class="small-muted">Git add:</span>
+                  <span id="statusAdd" class="status-badge failed">● Pendiente</span>
+                </div>
+                <div class="mb-2">
+                  <span class="small-muted">Commit:</span>
+                  <span id="statusCommit" class="status-badge failed">● Pendiente</span>
+                </div>
+                <div class="mb-2">
+                  <span class="small-muted">Push:</span>
+                  <span id="statusPush" class="status-badge failed">● Pendiente</span>
+                </div>
+                <div class="mb-2">
+                  <span class="small-muted">Deploy:</span>
+                  <span id="statusDeploy" class="status-badge failed">● Sin iniciar</span>
+                </div>
+              </div>
+              <hr>
+              <div class="callout">
+                <strong>Progreso:</strong> <span id="progressText">0 / 4 pasos</span>
+                <div class="progress mt-2" style="height:8px">
+                  <div id="progressBar" class="progress-bar bg-success" style="width:0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 6: TROUBLESHOOTING ===================== -->
+    <section class="section section-alt" id="errores">
+      <div class="container">
+        <div class="section-title">
+          <h2>Errores comunes y cómo resolverlos</h2>
+          <p>Deployar rara vez funciona al primer intento. Eso está bien. Cada error es una pista para aprender.</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3 style="color:#ef4444">❌ Build failed: Java version</h3>
+              <div class="terminal-sim">
+                <span class="error">Error: java.lang.UnsupportedClassVersionError</span><br>
+                <span class="output">class file has wrong version 61.0, should be 52.0</span>
+              </div>
+              <div class="callout success mt-2">
+                <strong>Solución:</strong> Crear <code>system.properties</code> con <code>java.runtime.version=17</code> en la raíz del proyecto.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3 style="color:#ef4444">❌ Port binding error</h3>
+              <div class="terminal-sim">
+                <span class="error">Web server failed to start. Port 8080 already in use</span>
+              </div>
+              <div class="callout success mt-2">
+                <strong>Solución:</strong> Agregar <code>server.port=${PORT:8080}</code> en <code>application.properties</code>. Render asigna su propio puerto.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3 style="color:#ef4444">❌ Application crashed / OOM</h3>
+              <div class="terminal-sim">
+                <span class="error">Error R14 (Memory quota exceeded)</span><br>
+                <span class="output">Process running memory is larger than limit</span>
+              </div>
+              <div class="callout success mt-2">
+                <strong>Solución:</strong> Agregar variable de entorno <code>JAVA_TOOL_OPTIONS=-Xmx256m</code> en Render.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3 style="color:#ef4444">❌ mvnw: Permission denied</h3>
+              <div class="terminal-sim">
+                <span class="error">bash: ./mvnw: Permission denied</span>
+              </div>
+              <div class="callout success mt-2">
+                <strong>Solución:</strong> Ejecutar en tu terminal local:<br>
+                <code>git update-index --chmod=+x mvnw</code><br>
+                <code>git commit -m "Fix mvnw permissions"</code><br>
+                <code>git push origin main</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3 style="color:#ef4444">❌ H2 file lock error</h3>
+              <div class="terminal-sim">
+                <span class="error">Database may be already in use: "mi-base.mv.db"</span>
+              </div>
+              <div class="callout success mt-2">
+                <strong>Solución:</strong> Cambiar a H2 en memoria para producción:<br>
+                <code>spring.datasource.url=jdbc:h2:mem:proddb</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3 style="color:#ef4444">❌ La app tarda en responder (cold start)</h3>
+              <div class="terminal-sim">
+                <span class="output">Tu app se "duerme" después de 15 min sin tráfico</span><br>
+                <span class="output">(Plan gratuito de Render)</span><br>
+                <span class="error">Primera visita tras dormir → 30-60 s de espera (JVM + Spring Boot)</span>
+              </div>
+              <div class="callout mt-2">
+                <strong>Explicación:</strong> En el plan free, Render "apaga" (spin down) tu app si no recibe <strong>tráfico entrante (inbound)</strong> durante <strong>15 minutos</strong>. Render monitorea las peticiones HTTP que llegan <em>desde afuera</em> a nivel de load-balancer — <strong>no</strong> la actividad interna del proceso. Esto significa que un <code>@Scheduled</code> de Spring o un hilo interno <strong>no cuenta</strong> como actividad y <strong>no impide</strong> el spin-down. La siguiente petición externa despierta el contenedor, pero el arranque de JVM + Spring Boot tarda entre <strong>30 y 60 segundos</strong>.
+              </div>
+              <div class="callout success mt-2">
+                <strong>Workaround — Cron EXTERNO cada 14 min:</strong> Un servicio gratuito como <a href="https://cron-job.org" target="_blank" rel="noopener">cron-job.org</a> o <a href="https://uptimerobot.com" target="_blank" rel="noopener">UptimeRobot</a> puede hacer un ping HTTP <strong>externo</strong> a tu URL cada 14 minutos para que Render nunca apague la app.
+                <ol class="mt-2 mb-0">
+                  <li>Crea una cuenta gratuita en <strong>cron-job.org</strong>.</li>
+                  <li>Crea un nuevo cron job con tu URL de Render (ej. <code>https://mi-app.onrender.com</code>).</li>
+                  <li>Configura la ejecución <strong>cada 14 minutos</strong>.</li>
+                  <li>Guarda → el servicio hará GET a tu app, manteniéndola despierta 24/7.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 7: DIAGRAMAS ===================== -->
+    <section class="section" id="diagramas">
+      <div class="container">
+        <div class="section-title">
+          <h2>Diagramas del flujo de deploy</h2>
+          <p>Visualiza cada etapa del proceso de publicación.</p>
+        </div>
+
+        <div class="diagram-grid">
+          <div class="diagram-card">
+            <h3>Flujo completo del deploy</h3>
+            <div class="mermaid">
+flowchart LR
+  A[Tu PC] -->|git push| B[GitHub]
+  B -->|webhook| C[Render]
+  C -->|mvnw clean install| D[Build]
+  D -->|java -jar| E[App en vivo]
+  E -->|URL pública| F[Usuarios]
+            </div>
+          </div>
+
+          <div class="diagram-card">
+            <h3>Ciclo de re-deploy</h3>
+            <div class="mermaid">
+flowchart TD
+  A[Editar código] --> B[git add .]
+  B --> C[git commit -m ...]
+  C --> D[git push origin main]
+  D --> E{Render detecta push}
+  E --> F[Build automático]
+  F --> G{¿Éxito?}
+  G -->|Sí| H[Deploy exitoso ✅]
+  G -->|No| I[Revisar logs ❌]
+  I --> A
+            </div>
+          </div>
+
+          <div class="diagram-card">
+            <h3>Arquitectura en Render</h3>
+            <div class="mermaid">
+flowchart TB
+  subgraph Render
+    WS[Web Service<br>Java 17] --> H2[(H2 en memoria)]
+    WS --> TH[Thymeleaf<br>Vistas HTML]
+  end
+  subgraph GitHub
+    REPO[Repositorio<br>main branch]
+  end
+  subgraph Usuario
+    NAV[Navegador]
+  end
+  REPO -->|auto deploy| WS
+  NAV -->|HTTPS| WS
+  WS -->|HTML| NAV
+            </div>
+          </div>
+
+          <div class="diagram-card">
+            <h3>Comparativa: Local vs Producción</h3>
+            <div class="mermaid">
+flowchart LR
+  subgraph Local
+    L1[localhost:8080]
+    L2[H2 en archivo]
+    L3[Puerto fijo]
+  end
+  subgraph Produccion
+    P1[tu-app.onrender.com]
+    P2[H2 en memoria]
+    P3[Puerto dinámico]
+  end
+  Local -.->|deploy| Produccion
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 8: QUIZ ===================== -->
+    <section class="section section-alt" id="quiz">
+      <div class="container">
+        <div class="section-title">
+          <h2>Quiz — ¿Estás listo para deployar?</h2>
+          <p>5 preguntas para verificar tu comprensión del proceso de deploy.</p>
+        </div>
+
+        <div class="quiz-card" id="quizContainer">
+          <div id="q1" class="quiz-q mb-4">
+            <h5>1. ¿Cuál es el orden correcto para publicar cambios?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q1" value="a"> push → commit → add</label>
+              <label><input type="radio" name="q1" value="b"> add → commit → push</label>
+              <label><input type="radio" name="q1" value="c"> commit → add → push</label>
+              <label><input type="radio" name="q1" value="d"> add → push → commit</label>
+            </div>
+            <div class="quiz-feedback" id="fb1" style="display:none"></div>
+          </div>
+
+          <div id="q2" class="quiz-q mb-4">
+            <h5>2. ¿Para qué sirve el archivo <code>system.properties</code>?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q2" value="a"> Para configurar la base de datos</label>
+              <label><input type="radio" name="q2" value="b"> Para indicar la versión de Java a Render</label>
+              <label><input type="radio" name="q2" value="c"> Para definir las rutas del controlador</label>
+              <label><input type="radio" name="q2" value="d"> Para guardar contraseñas</label>
+            </div>
+            <div class="quiz-feedback" id="fb2" style="display:none"></div>
+          </div>
+
+          <div id="q3" class="quiz-q mb-4">
+            <h5>3. ¿Qué hace <code>server.port=${PORT:8080}</code>?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q3" value="a"> Siempre usa el puerto 8080</label>
+              <label><input type="radio" name="q3" value="b"> Usa el puerto de Render si existe, o 8080 como respaldo</label>
+              <label><input type="radio" name="q3" value="c"> Desactiva el puerto</label>
+              <label><input type="radio" name="q3" value="d"> Cambia a puerto 443 (HTTPS)</label>
+            </div>
+            <div class="quiz-feedback" id="fb3" style="display:none"></div>
+          </div>
+
+          <div id="q4" class="quiz-q mb-4">
+            <h5>4. ¿Qué pasa cuando haces <code>git push</code> estando conectado a Render?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q4" value="a"> Nada, hay que deployar manualmente</label>
+              <label><input type="radio" name="q4" value="b"> Render detecta el push y re-deploya automáticamente</label>
+              <label><input type="radio" name="q4" value="c"> Se borra el deploy anterior</label>
+              <label><input type="radio" name="q4" value="d"> Solo funciona los lunes</label>
+            </div>
+            <div class="quiz-feedback" id="fb4" style="display:none"></div>
+          </div>
+
+          <div id="q5" class="quiz-q mb-4">
+            <h5>5. ¿Por qué usamos <code>-Xmx256m</code> en el plan gratuito?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q5" value="a"> Para que la app sea más rápida</label>
+              <label><input type="radio" name="q5" value="b"> Para limitar la memoria y no exceder el plan gratuito</label>
+              <label><input type="radio" name="q5" value="c"> Para activar el modo oscuro</label>
+              <label><input type="radio" name="q5" value="d"> No es necesario</label>
+            </div>
+            <div class="quiz-feedback" id="fb5" style="display:none"></div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" onclick="checkQuiz()">Verificar respuestas</button>
+          <div id="quizResult" class="callout mt-3" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 9: CHECKLIST FINAL ===================== -->
+    <section class="section" id="checklist">
+      <div class="container">
+        <div class="section-title">
+          <h2>Checklist de deploy completo</h2>
+          <p>Marca cada paso conforme lo completes. Si todos están verdes, ¡tu app debería estar en internet!</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-8">
+            <div class="info-card">
+              <div id="checklistItems">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck1">
+                  <label class="form-check-label" for="ck1"><strong>system.properties</strong> creado con <code>java.runtime.version=17</code></label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck2">
+                  <label class="form-check-label" for="ck2"><strong>application.properties</strong> con <code>server.port=${PORT:8080}</code></label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck3">
+                  <label class="form-check-label" for="ck3"><strong>H2 en memoria</strong> para producción: <code>jdbc:h2:mem:proddb</code></label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck4">
+                  <label class="form-check-label" for="ck4"><strong>git add .</strong> ejecutado</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck5">
+                  <label class="form-check-label" for="ck5"><strong>git commit -m "..."</strong> con mensaje descriptivo</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck6">
+                  <label class="form-check-label" for="ck6"><strong>git push origin main</strong> exitoso</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck7">
+                  <label class="form-check-label" for="ck7"><strong>Cuenta en Render</strong> creada con GitHub</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck8">
+                  <label class="form-check-label" for="ck8"><strong>Web Service</strong> creado en Render</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck9">
+                  <label class="form-check-label" for="ck9"><strong>Build Command:</strong> <code>./mvnw clean install -DskipTests</code></label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck10">
+                  <label class="form-check-label" for="ck10"><strong>Start Command:</strong> <code>java -jar target/*.jar</code></label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck11">
+                  <label class="form-check-label" for="ck11"><strong>Variable:</strong> <code>JAVA_TOOL_OPTIONS=-Xmx256m</code></label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck12">
+                  <label class="form-check-label" for="ck12"><strong>URL pública</strong> funciona en el navegador</label>
+                </div>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between align-items-center">
+                <span id="checklistProgress" class="fw-bold">0 / 12 completos</span>
+                <span id="checklistEmoji" style="font-size:2rem">🚀</span>
+              </div>
+              <div class="progress mt-2" style="height:10px">
+                <div id="checklistBar" class="progress-bar bg-success" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="info-card">
+              <h3>Resumen de comandos</h3>
+              <div class="terminal-sim">
+                <span class="comment"># 1. Preparar</span><br>
+                <span class="prompt">$</span> echo "java.runtime.version=17" > system.properties<br><br>
+                <span class="comment"># 2. Subir</span><br>
+                <span class="prompt">$</span> git add .<br>
+                <span class="prompt">$</span> git commit -m "Deploy ready"<br>
+                <span class="prompt">$</span> git push origin main<br><br>
+                <span class="comment"># 3. Verificar</span><br>
+                <span class="prompt">$</span> curl https://tu-app.onrender.com<br>
+                <span class="success">200 OK</span>
+              </div>
+            </div>
+
+            <div class="callout success mt-3">
+              <strong>¡Felicidades!</strong> Si llegaste hasta aquí con tu app en vivo, ya publicaste tu primera aplicación web en internet. Eso es un logro real.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Semana 7 — Deploy en Render · Programación I · Universidad Rafael Landívar</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Init
+    if (window.hljs) hljs.highlightAll();
+    if (window.tippy) tippy('[data-tippy-content]', { theme: 'light', maxWidth: 280 });
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+
+    /* ========== TERMINAL SIMULATOR ========== */
+    const termOut = document.getElementById('terminalOutput');
+    const termIn = document.getElementById('terminalInput');
+    let termState = { status: false, added: false, committed: false, pushed: false };
+
+    function appendTerm(html) {
+      const cursor = document.getElementById('cursor');
+      if (cursor) cursor.remove();
+      termOut.innerHTML += html + '<br><span class="prompt">~/mi-proyecto $</span> <span id="cursor" class="success">▊</span>';
+      termOut.scrollTop = termOut.scrollHeight;
+    }
+
+    function updateDeployStatus() {
+      const badges = {
+        statusGit: termState.status,
+        statusAdd: termState.added,
+        statusCommit: termState.committed,
+        statusPush: termState.pushed,
+      };
+      let done = 0;
+      for (const [id, ok] of Object.entries(badges)) {
+        const el = document.getElementById(id);
+        if (ok) {
+          el.className = 'status-badge live';
+          el.textContent = '● Completado';
+          done++;
+        }
+      }
+      if (termState.pushed) {
+        const d = document.getElementById('statusDeploy');
+        d.className = 'status-badge live';
+        d.textContent = '● ¡En vivo!';
+        done++;
+      }
+      document.getElementById('progressText').textContent = `${done} / 5 pasos`;
+      document.getElementById('progressBar').style.width = `${(done / 5) * 100}%`;
+    }
+
+    function runCommand() {
+      const cmd = termIn.value.trim();
+      if (!cmd) return;
+      termIn.value = '';
+
+      if (cmd === 'git status') {
+        termState.status = true;
+        appendTerm(`<span class="prompt">$</span> git status<br><span class="output">On branch main</span><br><span class="output">Changes not staged for commit:</span><br><span class="output">  modified: application.properties</span><br><span class="error">  new file: system.properties</span>`);
+      } else if (cmd === 'git add .') {
+        termState.added = true;
+        appendTerm(`<span class="prompt">$</span> git add .<br><span class="success">Archivos agregados al staging area.</span>`);
+      } else if (cmd.startsWith('git commit')) {
+        if (!termState.added) {
+          appendTerm(`<span class="prompt">$</span> ${cmd}<br><span class="error">Error: nothing to commit (¿hiciste git add . primero?)</span>`);
+        } else {
+          termState.committed = true;
+          const msg = cmd.match(/-m\s*"([^"]+)"/);
+          const commitMsg = msg ? msg[1] : 'deploy ready';
+          appendTerm(`<span class="prompt">$</span> ${cmd}<br><span class="success">[main a1b2c3d] ${commitMsg}</span><br><span class="output"> 2 files changed, 8 insertions(+)</span>`);
+        }
+      } else if (cmd === 'git push origin main') {
+        if (!termState.committed) {
+          appendTerm(`<span class="prompt">$</span> ${cmd}<br><span class="error">Error: nothing to push (¿hiciste commit primero?)</span>`);
+        } else {
+          termState.pushed = true;
+          appendTerm(`<span class="prompt">$</span> ${cmd}<br><span class="output">Enumerating objects: 8, done.</span><br><span class="output">Counting objects: 100% (8/8), done.</span><br><span class="success">To github.com:tu-usuario/mi-proyecto.git</span><br><span class="success">   a1b2c3d..e4f5g6h  main -> main</span><br><br><span class="success">🎉 ¡Push exitoso! Render detectará los cambios y comenzará el build automáticamente.</span>`);
+        }
+      } else {
+        appendTerm(`<span class="prompt">$</span> ${cmd}<br><span class="error">Comando no reconocido. Prueba: git status, git add ., git commit -m "...", git push origin main</span>`);
+      }
+      updateDeployStatus();
+    }
+
+    function quickCmd(cmd) {
+      termIn.value = cmd;
+      runCommand();
+    }
+
+    function resetTerminal() {
+      termState = { status: false, added: false, committed: false, pushed: false };
+      termOut.innerHTML = '<span class="comment"># Terminal reiniciada</span><br><span class="prompt">~/mi-proyecto $</span> <span id="cursor" class="success">▊</span>';
+      ['statusGit','statusAdd','statusCommit','statusPush','statusDeploy'].forEach(id => {
+        const el = document.getElementById(id);
+        el.className = 'status-badge failed';
+        el.textContent = '● Pendiente';
+      });
+      document.getElementById('progressText').textContent = '0 / 5 pasos';
+      document.getElementById('progressBar').style.width = '0%';
+    }
+
+    termIn.addEventListener('keydown', e => { if (e.key === 'Enter') runCommand(); });
+
+    /* ========== QUIZ ========== */
+    const answers = { q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'b' };
+    const explanations = {
+      q1: 'El orden es: add (agregar archivos), commit (guardar snapshot), push (enviar a GitHub).',
+      q2: 'system.properties le dice a Render qué versión de Java usar. Sin él, puede fallar el build.',
+      q3: '${PORT:8080} usa la variable PORT de Render si existe; si no, usa 8080 (para desarrollo local).',
+      q4: 'Render tiene un webhook que detecta cada push y dispara un nuevo build automáticamente.',
+      q5: 'El plan gratuito tiene 512 MB. Con -Xmx256m limitamos Java para que no consuma toda la memoria.'
+    };
+
+    function checkQuiz() {
+      let score = 0;
+      for (const [q, correct] of Object.entries(answers)) {
+        const sel = document.querySelector(`input[name="${q}"]:checked`);
+        const fb = document.getElementById('fb' + q.slice(1));
+        fb.style.display = 'block';
+        if (sel && sel.value === correct) {
+          score++;
+          fb.className = 'quiz-feedback callout success';
+          fb.innerHTML = `<strong>✅ Correcto.</strong> ${explanations[q]}`;
+        } else {
+          fb.className = 'quiz-feedback callout danger';
+          fb.innerHTML = `<strong>❌ Incorrecto.</strong> ${explanations[q]}`;
+        }
+      }
+      const result = document.getElementById('quizResult');
+      result.style.display = 'block';
+      if (score === 5) {
+        result.className = 'callout success mt-3';
+        result.innerHTML = `<strong>🎉 ${score}/5 — ¡Perfecto!</strong> Estás listo para deployar con confianza.`;
+      } else if (score >= 3) {
+        result.className = 'callout mt-3';
+        result.innerHTML = `<strong>👍 ${score}/5 — Bien.</strong> Revisa los temas marcados en rojo y vuelve a intentar.`;
+      } else {
+        result.className = 'callout warning mt-3';
+        result.innerHTML = `<strong>📖 ${score}/5 — Necesitas repasar.</strong> Relee las secciones anteriores y vuelve a intentar.`;
+      }
+    }
+
+    /* ========== CHECKLIST ========== */
+    document.querySelectorAll('#checklistItems input').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const total = document.querySelectorAll('#checklistItems input').length;
+        const done = document.querySelectorAll('#checklistItems input:checked').length;
+        document.getElementById('checklistProgress').textContent = `${done} / ${total} completos`;
+        document.getElementById('checklistBar').style.width = `${(done / total) * 100}%`;
+        const emoji = document.getElementById('checklistEmoji');
+        if (done === total) emoji.textContent = '🎉';
+        else if (done > total / 2) emoji.textContent = '💪';
+        else emoji.textContent = '🚀';
+      });
+    });
+  </script>
+</body>
+</html>

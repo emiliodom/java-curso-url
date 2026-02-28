@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Entregable — Sesión 7 (Deploy en Render)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">Sesión 7 — Deploy en Render</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="clase.html">Guía Docente</a></li>
+          <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rápido</a></li>
+          <li class="nav-item"><a class="nav-link active" href="entregable_equipo.html">Entregable</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero py-4">
+    <div class="container">
+      <div class="brand-pill">Entregable (equipo)</div>
+      <h1 class="h2 fw-bold mt-2 mb-1">Evidencias — Deploy en Render</h1>
+      <div class="small-muted" style="color:#a7f3d0">Completar con la URL pública, capturas y una explicación del proceso.</div>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <div class="hotspot-panel mb-3">
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Incluye la URL pública de tu app."></span>
+        <span class="hotspot-label">URL pública</span>
+      </div>
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Capturas del dashboard de Render y de la app en el celular."></span>
+        <span class="hotspot-label">Evidencia visual</span>
+      </div>
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Explica el proceso de deploy con tus propias palabras."></span>
+        <span class="hotspot-label">Explicación del proceso</span>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <!-- Columna izquierda -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h5 section-title">Datos del equipo</h2>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label">Curso / Sección</label>
+                <input class="form-control" placeholder="Programación I" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Semana</label>
+                <input class="form-control" value="Semana 7" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Integrantes</label>
+                <textarea class="form-control" rows="3" placeholder="Nombre 1
+Nombre 2
+Nombre 3"></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Repositorio de GitHub</label>
+                <input class="form-control" placeholder="https://github.com/tu-usuario/tu-proyecto" />
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">URL pública en Render</label>
+                <input class="form-control" placeholder="https://tu-app.onrender.com" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Checklist técnico (evidencias)</h2>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c1" />
+              <label class="form-check-label" for="c1"><code>system.properties</code> creado con Java 17.</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c2" />
+              <label class="form-check-label" for="c2"><code>application.properties</code> con puerto dinámico.</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c3" />
+              <label class="form-check-label" for="c3">H2 configurado en memoria para producción.</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c4" />
+              <label class="form-check-label" for="c4"><code>git add . + commit + push</code> ejecutados correctamente.</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c5" />
+              <label class="form-check-label" for="c5">Web Service creado en Render con Build y Start correctos.</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c6" />
+              <label class="form-check-label" for="c6">Variable <code>JAVA_TOOL_OPTIONS=-Xmx256m</code> configurada.</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c7" />
+              <label class="form-check-label" for="c7">URL pública funciona en el navegador.</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c8" />
+              <label class="form-check-label" for="c8">URL probada desde un celular.</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c9" />
+              <label class="form-check-label" for="c9">Re-deploy exitoso (cambio visible en producción).</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c10" />
+              <label class="form-check-label" for="c10">Explicación del proceso escrita (abajo).</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="c11" />
+              <label class="form-check-label" for="c11"><strong>(Bonus)</strong> Cron configurado en <a href="https://cron-job.org" target="_blank">cron-job.org</a> cada 14 min para evitar cold start.</label>
+            </div>
+            <hr class="sep my-3" />
+            <label class="form-label">Links o capturas (pegar aquí)</label>
+            <textarea class="form-control" rows="6" placeholder="- Captura del Dashboard de Render (status: Live)
+- Captura de la app abierta en el celular
+- Captura de los logs de build (BUILD SUCCESS)
+- Captura del re-deploy exitoso"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h5 section-title">Explicación del proceso de deploy (8–12 líneas)</h2>
+            <p class="small-muted">Explica el proceso como si lo enseñaras a alguien que nunca ha publicado una app:</p>
+            <textarea class="form-control" rows="8" placeholder="Ej: Primero verificamos que la app funcione en localhost. Luego creamos system.properties para decirle a Render qué versión de Java usar. Después ajustamos application.properties para que el puerto sea dinámico..."></textarea>
+            <div class="callout mt-3">
+              <div class="fw-semibold">Preguntas guía</div>
+              <div class="small-muted mt-2">
+                • ¿Qué es un deploy y por qué es necesario?<br>
+                • ¿Qué archivos necesita Render para funcionar?<br>
+                • ¿Qué pasa cuando haces git push estando conectado a Render?<br>
+                • ¿Cómo sabes si el deploy fue exitoso?
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Analogía del deploy</h2>
+            <p class="small-muted">Completa la frase con una analogía que te ayude a recordar:</p>
+            <textarea class="form-control" rows="3" placeholder="Deployar es como ______ porque ______. Por ejemplo: 'Deployar es como enviar una carta certificada porque primero escribes (código), luego la empacas (commit), la envías (push) y el cartero la entrega (Render).'"></textarea>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Bitácora de errores (si hubo)</h2>
+            <textarea class="form-control" rows="6" placeholder="1) ¿Qué error apareció en los logs?
+2) ¿Qué decía el mensaje?
+3) ¿Qué cambiaron para resolverlo?
+4) ¿Funcionó? ¿Qué aprendieron?"></textarea>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Rúbrica rápida</h2>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th style="min-width: 220px;">Criterio</th>
+                    <th class="text-center">Logro</th>
+                    <th class="text-center">Proceso</th>
+                    <th class="text-center">No</th>
+                    <th>Evidencia</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Archivos de configuración correctos</td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r1" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r1" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r1" /></td>
+                    <td><input class="form-control form-control-sm" placeholder="system.properties + app.props" /></td>
+                  </tr>
+                  <tr>
+                    <td>Git: add → commit → push exitosos</td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r2" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r2" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r2" /></td>
+                    <td><input class="form-control form-control-sm" placeholder="Captura de terminal" /></td>
+                  </tr>
+                  <tr>
+                    <td>Render configurado correctamente</td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r3" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r3" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r3" /></td>
+                    <td><input class="form-control form-control-sm" placeholder="Dashboard + Live" /></td>
+                  </tr>
+                  <tr>
+                    <td>URL pública funcional</td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r4" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r4" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r4" /></td>
+                    <td><input class="form-control form-control-sm" placeholder="URL + captura celular" /></td>
+                  </tr>
+                  <tr>
+                    <td>Re-deploy exitoso</td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r5" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r5" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r5" /></td>
+                    <td><input class="form-control form-control-sm" placeholder="Cambio visible en prod" /></td>
+                  </tr>
+                  <tr>
+                    <td>Explicación clara del proceso</td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r6" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r6" /></td>
+                    <td class="text-center"><input class="form-check-input" type="radio" name="r6" /></td>
+                    <td><input class="form-control form-control-sm" placeholder="Texto de 8-12 líneas" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout mt-3">
+              <div class="fw-semibold">Criterio transversal</div>
+              <div class="small-muted mt-2">El equipo debe poder explicar el flujo completo: desde el commit hasta la URL pública, sin leer código.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="py-4 border-top bg-white">
+    <div class="container small-muted">Entregable — Sesión 7 · Recomendación: guardar como PDF o adjuntar capturas.</div>
+  </footer>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    tippy('[data-tippy-content]', { theme: 'light', maxWidth: 280 });
+  </script>
+</body>
+</html>
