@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Semana 6 — Persistencia, Login y Roles (Guia Interactiva)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">Sesion 6 — Persistencia y Roles</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="clase.html">Guia Docente</a></li>
+        <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+        <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rapido</a></li>
+        <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero">
+  <div class="container py-5">
+    <p class="eyebrow">Semana 6 · Desarrollo web con Spring Boot II</p>
+    <h1>Persistencia, Login y Roles</h1>
+    <p class="lead">Guia interactiva para implementar login, roles de usuario, renderizado condicional, graficos con datos reales y consultas a la base de datos H2.</p>
+    <div class="d-flex gap-2 flex-wrap mt-3">
+      <a class="btn btn-primary" href="#mapa-semana6">Mapa de la semana</a>
+      <a class="btn btn-outline-light" href="#login">Login paso a paso</a>
+      <a class="btn btn-outline-light" href="#roles">Roles y permisos</a>
+      <a class="btn btn-outline-light" href="#condicional">Renderizado condicional</a>
+      <a class="btn btn-outline-light" href="#consultas">Consultas a BD</a>
+      <a class="btn btn-outline-light" href="#graficos">Graficos</a>
+      <a class="btn btn-outline-light" href="#diagramas">Diagramas</a>
+      <a class="btn btn-outline-light" href="#quiz">Quiz</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════ 1. MAPA DE LA SEMANA ═══════════ -->
+<section class="section" id="mapa-semana6">
+  <div class="container">
+    <div class="section-title">
+      <h2>Mapa de la Semana 6</h2>
+      <p>Todo lo que construiremos esta semana en un solo vistazo. Cada pieza se conecta con las anteriores.</p>
+    </div>
+    <div class="mvc-map">
+      <div class="mvc-step">
+        <span>1</span>
+        <h3>Persistencia</h3>
+        <p>La BD H2 ya guarda datos. Ahora aprenderemos a <strong>buscar y filtrar</strong> con consultas.</p>
+      </div>
+      <div class="mvc-step">
+        <span>2</span>
+        <h3>Login</h3>
+        <p>Un formulario de inicio de sesion conectado a <strong>Spring Security</strong>.</p>
+      </div>
+      <div class="mvc-step">
+        <span>3</span>
+        <h3>Roles</h3>
+        <p>Cada usuario tiene un rol (<span class="role-badge role-admin">ADMIN</span> o <span class="role-badge role-user">USER</span>) que define que puede hacer.</p>
+      </div>
+      <div class="mvc-step">
+        <span>4</span>
+        <h3>Condicional</h3>
+        <p>La vista muestra u oculta elementos segun el rol del usuario conectado.</p>
+      </div>
+      <div class="mvc-step">
+        <span>5</span>
+        <h3>Consultas</h3>
+        <p>Buscar datos en H2 con metodos de Spring Data JPA (<code>findBy...</code>).</p>
+      </div>
+      <div class="mvc-step">
+        <span>6</span>
+        <h3>Graficos</h3>
+        <p>Mostrar datos en graficos con <strong>Chart.js</strong> para visualizar la informacion.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Conexion con Semana 5:</strong> ya tenemos el CRUD funcionando (GET/POST, rutas, controlador, repositorio). Esta semana agregamos <em>seguridad</em> (quien puede ver que) y <em>inteligencia</em> (buscar y graficar datos).
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 2. DEPENDENCIAS NUEVAS ═══════════ -->
+<section class="section section-alt" id="dependencias">
+  <div class="container">
+    <div class="section-title">
+      <h2>Dependencias nuevas para Semana 6</h2>
+      <p>Agregamos Spring Security y Thymeleaf Extras para roles. Todo lo demas ya lo tenemos.</p>
+    </div>
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Lo que ya tenemos (Semana 5)</h3>
+          <ul>
+            <li><strong>spring-boot-starter-web</strong> — rutas y controladores</li>
+            <li><strong>spring-boot-starter-thymeleaf</strong> — vistas HTML</li>
+            <li><strong>spring-boot-starter-data-jpa</strong> — acceso a BD</li>
+            <li><strong>h2</strong> — base de datos ligera</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Lo nuevo (Semana 6)</h3>
+          <pre><code class="language-xml">&lt;!-- En pom.xml, dentro de &lt;dependencies&gt; --&gt;
+<span class="code-hotspot" data-tippy-content="Habilita login, logout, roles y proteccion de rutas.">&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;</span>
+
+<span class="code-hotspot" data-tippy-content="Permite usar sec:authorize en Thymeleaf para mostrar/ocultar segun rol.">&lt;dependency&gt;
+  &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;
+  &lt;artifactId&gt;thymeleaf-extras-springsecurity6&lt;/artifactId&gt;
+&lt;/dependency&gt;</span></code></pre>
+          <p class="small">Sin estas dependencias, no hay login ni renderizado condicional por rol.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 3. LOGIN PASO A PASO ═══════════ -->
+<section class="section" id="login">
+  <div class="container">
+    <div class="section-title">
+      <h2>Login paso a paso</h2>
+      <p>Implementar un formulario de inicio de sesion con Spring Security. Sin codigo complicado, paso a paso.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Paso 1 — Configuracion de seguridad</h3>
+          <p>Crear una clase que defina <em>quien puede entrar</em> y <em>a donde</em>.</p>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Paquete donde vive la configuracion.">package com.tugrupo.tuapp.configuracion;</span>
+
+<span class="code-hotspot" data-tippy-content="Marca esta clase como configuracion de Spring.">@Configuration</span>
+<span class="code-hotspot" data-tippy-content="Habilita la seguridad web.">@EnableWebSecurity</span>
+public class SeguridadConfig {
+
+  <span class="code-hotspot" data-tippy-content="Define las reglas de acceso y el login.">@Bean</span>
+  public SecurityFilterChain filtro(HttpSecurity http)
+      throws Exception {
+    http
+      <span class="code-hotspot" data-tippy-content="Define que rutas son publicas y cuales requieren login.">.authorizeHttpRequests(auth -> auth
+        .requestMatchers("/", "/css/**").permitAll()
+        .requestMatchers("/admin/**").hasRole("ADMIN")
+        .anyRequest().authenticated()
+      )</span>
+      <span class="code-hotspot" data-tippy-content="Pagina de login personalizada.">.formLogin(form -> form
+        .loginPage("/login")
+        .defaultSuccessUrl("/recursos", true)
+        .permitAll()
+      )</span>
+      <span class="code-hotspot" data-tippy-content="Al cerrar sesion, vuelve al inicio.">.logout(logout -> logout
+        .logoutSuccessUrl("/login?logout")
+        .permitAll()
+      )</span>;
+    return http.build();
+  }
+}</code></pre>
+          <p class="small"><strong>Analogia:</strong> es como un guardia de seguridad que revisa credenciales antes de dejar pasar.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Paso 2 — Usuarios en memoria</h3>
+          <p>Para empezar, definimos usuarios directamente en el codigo (sin BD de usuarios aun).</p>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Define los usuarios y sus contrasenas.">@Bean</span>
+public UserDetailsService usuarios() {
+  <span class="code-hotspot" data-tippy-content="Usuario admin con rol ADMIN.">UserDetails admin = User.builder()
+    .username("admin")
+    .password(cifrador().encode("admin123"))
+    .roles("ADMIN")
+    .build();</span>
+
+  <span class="code-hotspot" data-tippy-content="Usuario docente con rol USER.">UserDetails docente = User.builder()
+    .username("docente")
+    .password(cifrador().encode("docente123"))
+    .roles("USER")
+    .build();</span>
+
+  return new InMemoryUserDetailsManager(admin, docente);
+}
+
+<span class="code-hotspot" data-tippy-content="Cifra las contrasenas (obligatorio en Spring Security).">@Bean</span>
+public PasswordEncoder cifrador() {
+  return new BCryptPasswordEncoder();
+}</code></pre>
+          <p class="small"><strong>Nota importante:</strong> las contrasenas SIEMPRE se cifran. Nunca se guardan en texto plano.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Paso 3 — Controlador del login</h3>
+          <p>Una ruta sencilla que muestra el formulario de login.</p>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Controlador para la vista de login.">@Controller</span>
+public class LoginControlador {
+
+  <span class="code-hotspot" data-tippy-content="Ruta GET que muestra el formulario de login.">@GetMapping("/login")</span>
+  public String login() {
+    return "login";
+  }
+}</code></pre>
+          <p class="small">Spring Security se encarga del POST automaticamente. Solo necesitamos la vista.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="interactive-panel">
+          <h3>Demo interactiva: Login</h3>
+          <p class="small-muted">Prueba el flujo del login aqui mismo. Escribe las credenciales y observa que pasa.</p>
+          <div class="login-demo" id="loginDemo">
+            <h3>Iniciar sesion</h3>
+            <div class="mb-3">
+              <label class="form-label">Usuario</label>
+              <input type="text" class="form-control" id="demoUser" placeholder="admin o docente">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Contrasena</label>
+              <input type="password" class="form-control" id="demoPass" placeholder="admin123 o docente123">
+            </div>
+            <button class="btn btn-primary" onclick="demoLogin()">Entrar</button>
+            <div id="loginResult" class="mt-3" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="info-card">
+          <h3>Paso 4 — Vista del login (templates/login.html)</h3>
+          <pre><code class="language-html"><span class="code-hotspot" data-tippy-content="Formulario que Spring Security procesa automaticamente.">&lt;form th:action="@{/login}" method="post"&gt;</span>
+  <span class="code-hotspot" data-tippy-content="Mensaje de error si las credenciales son incorrectas.">&lt;div th:if="${param.error}" class="alert alert-danger"&gt;
+    Usuario o contrasena incorrecta.
+  &lt;/div&gt;</span>
+  <span class="code-hotspot" data-tippy-content="Mensaje al cerrar sesion.">&lt;div th:if="${param.logout}" class="alert alert-success"&gt;
+    Sesion cerrada correctamente.
+  &lt;/div&gt;</span>
+
+  &lt;div class="mb-3"&gt;
+    &lt;label&gt;Usuario&lt;/label&gt;
+    <span class="code-hotspot" data-tippy-content="El name DEBE ser 'username' para Spring Security.">&lt;input type="text" name="username" required /&gt;</span>
+  &lt;/div&gt;
+  &lt;div class="mb-3"&gt;
+    &lt;label&gt;Contrasena&lt;/label&gt;
+    <span class="code-hotspot" data-tippy-content="El name DEBE ser 'password' para Spring Security.">&lt;input type="password" name="password" required /&gt;</span>
+  &lt;/div&gt;
+  &lt;button type="submit" class="btn btn-primary w-100"&gt;Entrar&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          <div class="callout warning">
+            <strong>Error comun:</strong> si los campos no se llaman <code>username</code> y <code>password</code>, Spring Security no los reconoce y el login siempre falla.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 4. ROLES Y PERMISOS ═══════════ -->
+<section class="section section-alt" id="roles">
+  <div class="container">
+    <div class="section-title">
+      <h2>Roles y permisos</h2>
+      <p>Cada usuario tiene un rol que define que puede ver y que puede hacer.</p>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="interactive-panel text-center">
+          <span class="role-badge role-admin mb-2">ADMIN</span>
+          <h3>Administrador</h3>
+          <ul class="text-start">
+            <li>Ve toda la informacion</li>
+            <li>Puede crear, editar y borrar</li>
+            <li>Ve los graficos y estadisticas</li>
+            <li>Gestiona usuarios</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="interactive-panel text-center">
+          <span class="role-badge role-user mb-2">USER</span>
+          <h3>Docente</h3>
+          <ul class="text-start">
+            <li>Ve la informacion general</li>
+            <li>Puede crear registros</li>
+            <li>No puede borrar</li>
+            <li>Ve graficos basicos</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="interactive-panel text-center">
+          <span class="role-badge role-viewer mb-2">ANONIMO</span>
+          <h3>Sin login</h3>
+          <ul class="text-start">
+            <li>Solo puede ver pagina de inicio</li>
+            <li>Redirige al login si intenta entrar</li>
+            <li>No ve datos ni graficos</li>
+            <li>No puede crear nada</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout mt-4">
+      <strong>Analogia para la clase:</strong> piensa en un colegio. El <span class="role-badge role-admin">ADMIN</span> es el director (acceso total). El <span class="role-badge role-user">USER</span> es un maestro (acceso a su salon). El <span class="role-badge role-viewer">ANONIMO</span> es un visitante (solo recepcion).
+    </div>
+
+    <div class="info-card mt-4">
+      <h3>Como proteger rutas por rol</h3>
+      <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Reglas de acceso en SeguridadConfig.">http.authorizeHttpRequests(auth -> auth</span>
+  <span class="code-hotspot" data-tippy-content="Paginas publicas: inicio, CSS, login.">.requestMatchers("/", "/css/**", "/login").permitAll()</span>
+  <span class="code-hotspot" data-tippy-content="Solo ADMIN puede acceder a /admin/**.">.requestMatchers("/admin/**").hasRole("ADMIN")</span>
+  <span class="code-hotspot" data-tippy-content="Cualquier ruta requiere estar autenticado.">.anyRequest().authenticated()</span>
+);</code></pre>
+      <p class="small-muted mt-2">El orden importa: las reglas mas especificas van primero.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 5. RENDERIZADO CONDICIONAL ═══════════ -->
+<section class="section" id="condicional">
+  <div class="container">
+    <div class="section-title">
+      <h2>Renderizado condicional</h2>
+      <p>Mostrar u ocultar elementos HTML segun el rol del usuario. La vista cambia segun quien este conectado.</p>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Paso 1 — Agregar namespace de seguridad</h3>
+          <pre><code class="language-html"><span class="code-hotspot" data-tippy-content="Agrega el namespace de Thymeleaf Security al HTML.">&lt;html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"&gt;</span></code></pre>
+          <p class="small">Sin esta linea, las etiquetas <code>sec:</code> no funcionan.</p>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Paso 2 — Condicionales con sec:authorize</h3>
+          <pre><code class="language-html"><span class="code-hotspot" data-tippy-content="Solo visible para ADMIN.">&lt;div sec:authorize="hasRole('ADMIN')"&gt;
+  &lt;a href="/admin/panel"&gt;Panel de administracion&lt;/a&gt;
+&lt;/div&gt;</span>
+
+<span class="code-hotspot" data-tippy-content="Visible para cualquier usuario autenticado.">&lt;div sec:authorize="isAuthenticated()"&gt;
+  Bienvenido, &lt;span sec:authentication="name"&gt;&lt;/span&gt;
+&lt;/div&gt;</span>
+
+<span class="code-hotspot" data-tippy-content="Visible solo si NO esta autenticado.">&lt;div sec:authorize="!isAuthenticated()"&gt;
+  &lt;a href="/login"&gt;Iniciar sesion&lt;/a&gt;
+&lt;/div&gt;</span></code></pre>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="interactive-panel">
+          <h3>Simulacion interactiva: &iquest;que ve cada rol?</h3>
+          <p class="small-muted">Haz clic en un rol para ver como cambia la vista.</p>
+          <div class="d-flex gap-2 mb-3 flex-wrap">
+            <button class="btn btn-sm btn-outline-danger" onclick="simRole('admin')">Ver como ADMIN</button>
+            <button class="btn btn-sm btn-outline-success" onclick="simRole('user')">Ver como USER</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="simRole('anon')">Ver como ANONIMO</button>
+          </div>
+          <div id="simView" class="p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0; min-height:120px;">
+            <p class="text-muted text-center">Selecciona un rol arriba para ver la simulacion.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Condicional con th:if (datos)</h3>
+          <pre><code class="language-html"><span class="code-hotspot" data-tippy-content="Solo muestra si hay recursos en la lista.">&lt;div th:if="${not #lists.isEmpty(recursos)}"&gt;
+  &lt;table&gt;...&lt;/table&gt;
+&lt;/div&gt;</span>
+
+<span class="code-hotspot" data-tippy-content="Muestra mensaje si la lista esta vacia.">&lt;div th:if="${#lists.isEmpty(recursos)}"&gt;
+  &lt;p&gt;No hay recursos registrados todavia.&lt;/p&gt;
+&lt;/div&gt;</span></code></pre>
+          <p class="small">Usa <code>th:if</code> para datos y <code>sec:authorize</code> para roles.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Ejemplo completo: boton "Borrar" solo para ADMIN</h3>
+          <pre><code class="language-html">&lt;tr th:each="r : ${recursos}"&gt;
+  &lt;td th:text="${r.titulo}"&gt;&lt;/td&gt;
+  &lt;td th:text="${r.tipo}"&gt;&lt;/td&gt;
+  <span class="code-hotspot" data-tippy-content="Solo ADMIN ve el boton de borrar.">&lt;td sec:authorize="hasRole('ADMIN')"&gt;
+    &lt;a th:href="@{/recursos/borrar/{id}(id=${r.id})}"
+       class="btn btn-danger btn-sm"&gt;Borrar&lt;/a&gt;
+  &lt;/td&gt;</span>
+&lt;/tr&gt;</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 6. CONSULTAS A BD ═══════════ -->
+<section class="section section-alt" id="consultas">
+  <div class="container">
+    <div class="section-title">
+      <h2>Consultas a la base de datos</h2>
+      <p>Spring Data JPA genera consultas automaticamente con nombres de metodo. No necesitas escribir SQL.</p>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Repositorio con consultas personalizadas</h3>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Interfaz del repositorio con metodos de busqueda.">public interface RecursoDidacticoRepositorio
+    extends JpaRepository&lt;RecursoDidactico, Long&gt; {</span>
+
+  <span class="code-hotspot" data-tippy-content="Busca recursos por tipo (ej: 'Video', 'Libro').">List&lt;RecursoDidactico&gt; findByTipo(String tipo);</span>
+
+  <span class="code-hotspot" data-tippy-content="Busca solo los disponibles.">List&lt;RecursoDidactico&gt; findByDisponibleTrue();</span>
+
+  <span class="code-hotspot" data-tippy-content="Busca por titulo que contenga una palabra.">List&lt;RecursoDidactico&gt; findByTituloContainingIgnoreCase(
+      String palabra);</span>
+
+  <span class="code-hotspot" data-tippy-content="Cuenta cuantos recursos hay por tipo.">long countByTipo(String tipo);</span>
+}</code></pre>
+          <p class="small"><strong>Magia:</strong> Spring lee el nombre del metodo y genera la consulta SQL automaticamente.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Controlador con filtro</h3>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Ruta GET con parametro de busqueda opcional.">@GetMapping</span>
+public String listar(
+    <span class="code-hotspot" data-tippy-content="Parametro opcional de la URL.">@RequestParam(required = false) String tipo,</span>
+    <span class="code-hotspot" data-tippy-content="Parametro de busqueda por texto.">@RequestParam(required = false) String buscar,</span>
+    Model model) {
+
+  List&lt;RecursoDidactico&gt; recursos;
+
+  <span class="code-hotspot" data-tippy-content="Filtra por tipo si se especifica.">if (tipo != null && !tipo.isEmpty()) {
+    recursos = repo.findByTipo(tipo);
+  }</span> <span class="code-hotspot" data-tippy-content="Filtra por texto si se especifica.">else if (buscar != null && !buscar.isEmpty()) {
+    recursos = repo.findByTituloContainingIgnoreCase(buscar);
+  }</span> <span class="code-hotspot" data-tippy-content="Sin filtro, muestra todos.">else {
+    recursos = repo.findAll();
+  }</span>
+
+  model.addAttribute("recursos", recursos);
+  return "recursos/lista";
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="interactive-panel">
+          <h3>Simulacion: &iquest;que consulta ejecuta cada URL?</h3>
+          <p class="small-muted">Haz clic en una URL para ver que metodo se activa y que devuelve.</p>
+          <div class="d-flex gap-2 flex-wrap mb-3">
+            <button class="btn btn-sm btn-outline-primary" onclick="simQuery('all')">/recursos</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="simQuery('tipo')">/recursos?tipo=Video</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="simQuery('buscar')">/recursos?buscar=java</button>
+          </div>
+          <div id="queryResult" class="p-3 rounded" style="background:#0f172a; color:#f8fafc; border-radius:12px; min-height:80px; font-family:monospace; font-size:0.9rem;">
+            <span class="text-muted">Selecciona una URL arriba...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Formulario de busqueda en la vista</h3>
+          <pre><code class="language-html">&lt;form th:action="@{/recursos}" method="get"
+      class="d-flex gap-2 mb-3"&gt;
+  <span class="code-hotspot" data-tippy-content="Campo de texto para buscar.">&lt;input type="text" name="buscar"
+    placeholder="Buscar por titulo..."
+    class="form-control" /&gt;</span>
+  <span class="code-hotspot" data-tippy-content="Selector de tipo para filtrar.">&lt;select name="tipo" class="form-select" style="max-width:200px"&gt;
+    &lt;option value=""&gt;Todos los tipos&lt;/option&gt;
+    &lt;option value="Video"&gt;Video&lt;/option&gt;
+    &lt;option value="Libro"&gt;Libro&lt;/option&gt;
+    &lt;option value="Articulo"&gt;Articulo&lt;/option&gt;
+  &lt;/select&gt;</span>
+  &lt;button type="submit" class="btn btn-primary"&gt;Filtrar&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Consola H2: ver los datos directamente</h3>
+          <p>Accede a <strong>http://localhost:8080/h2-console</strong> para ver tu BD.</p>
+          <pre><code class="language-sql"><span class="code-hotspot" data-tippy-content="Muestra todos los registros.">SELECT * FROM RECURSOS_DIDACTICOS;</span>
+
+<span class="code-hotspot" data-tippy-content="Cuenta registros por tipo.">SELECT tipo, COUNT(*) as total
+FROM RECURSOS_DIDACTICOS
+GROUP BY tipo;</span>
+
+<span class="code-hotspot" data-tippy-content="Busca por titulo.">SELECT * FROM RECURSOS_DIDACTICOS
+WHERE LOWER(titulo) LIKE '%java%';</span></code></pre>
+          <p class="small">La consola H2 es tu herramienta de verificacion: si los datos estan ahi, el problema esta en la vista.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 7. GRAFICOS CON CHART.JS ═══════════ -->
+<section class="section" id="graficos">
+  <div class="container">
+    <div class="section-title">
+      <h2>Graficos con Chart.js</h2>
+      <p>Visualiza los datos de la BD en barras y donas. El controlador cuenta y la vista dibuja.</p>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Controlador: enviar conteo a la vista</h3>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Ruta que prepara datos para el grafico.">@GetMapping("/estadisticas")</span>
+public String estadisticas(Model model) {
+  <span class="code-hotspot" data-tippy-content="Cuenta por tipo.">model.addAttribute("videos", repo.countByTipo("Video"));</span>
+  model.addAttribute("libros", repo.countByTipo("Libro"));
+  model.addAttribute("articulos", repo.countByTipo("Articulo"));
+  <span class="code-hotspot" data-tippy-content="Total de registros.">model.addAttribute("total", repo.count());</span>
+  return "recursos/estadisticas";
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="info-card">
+          <h3>Vista: dibujar el grafico</h3>
+          <pre><code class="language-html"><span class="code-hotspot" data-tippy-content="Incluir Chart.js desde CDN.">&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</span>
+
+&lt;canvas id="graficoTipos" width="400" height="200"&gt;&lt;/canvas&gt;
+
+&lt;script th:inline="javascript"&gt;
+  <span class="code-hotspot" data-tippy-content="Thymeleaf inyecta los valores del controlador.">const videos = [[${videos}]];
+  const libros = [[${libros}]];
+  const articulos = [[${articulos}]];</span>
+
+  new Chart(document.getElementById('graficoTipos'), {
+    <span class="code-hotspot" data-tippy-content="Tipo de grafico: barras.">type: 'bar',</span>
+    data: {
+      labels: ['Videos', 'Libros', 'Articulos'],
+      datasets: [{
+        label: 'Cantidad por tipo',
+        <span class="code-hotspot" data-tippy-content="Datos del grafico.">data: [videos, libros, articulos],</span>
+        backgroundColor: ['#6366f1','#22c55e','#f59e0b']
+      }]
+    }
+  });
+&lt;/script&gt;</code></pre>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="chart-container">
+          <h3 class="h5 mb-3">Demo: Grafico de barras</h3>
+          <canvas id="demoBar" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="chart-container">
+          <h3 class="h5 mb-3">Demo: Grafico de dona</h3>
+          <canvas id="demoDoughnut" height="200"></canvas>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="interactive-panel">
+          <h3>Modificador interactivo de datos</h3>
+          <p class="small-muted">Cambia los valores y observa como se actualiza el grafico en tiempo real.</p>
+          <div class="row g-2 align-items-end">
+            <div class="col-auto">
+              <label class="form-label">Videos</label>
+              <input type="number" class="form-control" id="dataVideos" value="12" min="0" max="100" onchange="updateCharts()">
+            </div>
+            <div class="col-auto">
+              <label class="form-label">Libros</label>
+              <input type="number" class="form-control" id="dataLibros" value="8" min="0" max="100" onchange="updateCharts()">
+            </div>
+            <div class="col-auto">
+              <label class="form-label">Articulos</label>
+              <input type="number" class="form-control" id="dataArticulos" value="5" min="0" max="100" onchange="updateCharts()">
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-primary" onclick="updateCharts()">Actualizar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 8. DIAGRAMAS ═══════════ -->
+<section class="section section-alt" id="diagramas">
+  <div class="container">
+    <div class="section-title">
+      <h2>Diagramas explicativos</h2>
+      <p>Visualiza el flujo de seguridad, roles y consultas.</p>
+    </div>
+    <div class="diagram-grid">
+      <div class="diagram-card">
+        <h3>Flujo de login</h3>
+        <pre class="mermaid">sequenceDiagram
+  participant U as Usuario
+  participant L as /login
+  participant S as Spring Security
+  participant C as Controlador
+  U->>L: Escribe credenciales
+  L->>S: POST /login
+  S->>S: Verifica usuario y contrasena
+  alt Credenciales correctas
+    S-->>C: Redirige a /recursos
+    C-->>U: Muestra lista
+  else Credenciales incorrectas
+    S-->>L: Muestra error
+  end
+        </pre>
+      </div>
+      <div class="diagram-card">
+        <h3>Roles y acceso</h3>
+        <pre class="mermaid">flowchart TB
+  REQ[Peticion del usuario] --> SEC{Spring Security}
+  SEC -->|Sin login| LOGIN[/login]
+  SEC -->|ADMIN| ADMIN[Todo habilitado]
+  SEC -->|USER| USER[Solo lectura y crear]
+  ADMIN --> CRUD[CRUD completo]
+  ADMIN --> STATS[Estadisticas]
+  USER --> READ[Listar y crear]
+        </pre>
+      </div>
+      <div class="diagram-card">
+        <h3>Consultas JPA</h3>
+        <pre class="mermaid">flowchart LR
+  URL[URL con parametros] --> CTRL[Controlador]
+  CTRL --> REPO[Repositorio]
+  REPO -->|findAll| BD[(H2)]
+  REPO -->|findByTipo| BD
+  REPO -->|findByTitulo...| BD
+  BD --> REPO --> CTRL --> VIEW[Vista Thymeleaf]
+        </pre>
+      </div>
+      <div class="diagram-card">
+        <h3>Renderizado condicional</h3>
+        <pre class="mermaid">flowchart TB
+  VIEW[Vista HTML] --> CHK{Rol del usuario?}
+  CHK -->|ADMIN| ALL[Muestra todo: crear + editar + borrar + estadisticas]
+  CHK -->|USER| SOME[Muestra: crear + listar]
+  CHK -->|Anonimo| NONE[Redirige a login]
+        </pre>
+      </div>
+      <div class="diagram-card">
+        <h3>Estructura del proyecto Semana 6</h3>
+        <pre class="mermaid">flowchart TB
+  root[src/main]
+  root --> java[java/...]
+  java --> ctrl[controlador/]
+  java --> model[modelo/]
+  java --> repo[repositorio/]
+  java --> config[configuracion/]
+  root --> res[resources/]
+  res --> tmpl[templates/]
+  tmpl --> login[login.html]
+  tmpl --> rec[recursos/]
+  rec --> list[lista.html]
+  rec --> form[formulario.html]
+  rec --> stats[estadisticas.html]
+        </pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 9. QUIZ ═══════════ -->
+<section class="section" id="quiz">
+  <div class="container">
+    <div class="section-title">
+      <h2>Quiz rapido</h2>
+      <p>Responde y compara con la solucion al final. Se honesto contigo mismo.</p>
+    </div>
+    <div class="quiz-card">
+      <ol>
+        <li>
+          &iquest;Que dependencia se agrega para tener login y roles?
+          <div class="quiz-options">
+            <label><input type="radio" name="q1" /> spring-boot-starter-thymeleaf</label>
+            <label><input type="radio" name="q1" /> spring-boot-starter-security</label>
+            <label><input type="radio" name="q1" /> spring-boot-starter-data-jpa</label>
+          </div>
+        </li>
+        <li>
+          &iquest;Que atributo HTML se usa para mostrar un elemento solo a ADMIN?
+          <div class="quiz-options">
+            <label><input type="radio" name="q2" /> th:if="admin"</label>
+            <label><input type="radio" name="q2" /> sec:authorize="hasRole('ADMIN')"</label>
+            <label><input type="radio" name="q2" /> th:role="ADMIN"</label>
+          </div>
+        </li>
+        <li>
+          &iquest;Como busca Spring Data JPA los recursos de tipo "Video"?
+          <div class="quiz-options">
+            <label><input type="radio" name="q3" /> repo.search("Video")</label>
+            <label><input type="radio" name="q3" /> repo.findByTipo("Video")</label>
+            <label><input type="radio" name="q3" /> repo.query("tipo=Video")</label>
+          </div>
+        </li>
+        <li>
+          &iquest;Como se llama el campo del formulario de login para el usuario?
+          <div class="quiz-options">
+            <label><input type="radio" name="q4" /> user</label>
+            <label><input type="radio" name="q4" /> username</label>
+            <label><input type="radio" name="q4" /> login</label>
+          </div>
+        </li>
+        <li>
+          &iquest;Que pasa si un USER intenta acceder a /admin/panel?
+          <div class="quiz-options">
+            <label><input type="radio" name="q5" /> Ve la pagina normalmente</label>
+            <label><input type="radio" name="q5" /> Recibe error 403 (Prohibido)</label>
+            <label><input type="radio" name="q5" /> Se le redirige al login</label>
+          </div>
+        </li>
+      </ol>
+      <details class="quiz-answer">
+        <summary>Ver respuestas</summary>
+        <div class="small-muted mt-2">
+          1) spring-boot-starter-security<br>
+          2) sec:authorize="hasRole('ADMIN')"<br>
+          3) repo.findByTipo("Video")<br>
+          4) username<br>
+          5) Recibe error 403 (Prohibido) — tiene login pero no permiso
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 10. CHECKLIST ═══════════ -->
+<section class="section section-alt" id="checklist">
+  <div class="container">
+    <div class="section-title">
+      <h2>Checklist de aprendizaje</h2>
+      <p>Verifica que el flujo quedo claro antes de continuar a la Semana 7.</p>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="info-card">
+          <h3>Lo que debo saber explicar</h3>
+          <ol>
+            <li><span class="code-hotspot" data-tippy-content="Spring Security intercepta cada peticion y verifica credenciales.">Como funciona el login con Spring Security.</span></li>
+            <li><span class="code-hotspot" data-tippy-content="ADMIN ve todo, USER solo lee y crea.">Que puede hacer cada rol.</span></li>
+            <li><span class="code-hotspot" data-tippy-content="sec:authorize muestra/oculta segun el rol.">Como mostrar u ocultar un elemento segun el rol.</span></li>
+            <li><span class="code-hotspot" data-tippy-content="findByTipo(), findByDisponibleTrue(), etc.">Como buscar datos con el nombre del metodo.</span></li>
+            <li><span class="code-hotspot" data-tippy-content="El controlador cuenta y la vista dibuja con Chart.js.">Como pasar datos del controlador a un grafico.</span></li>
+          </ol>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="info-card">
+          <h3>Lo que debe funcionar</h3>
+          <ol>
+            <li><span class="code-hotspot" data-tippy-content="Al abrir /recursos sin login, redirige a /login.">Login funciona y protege las rutas.</span></li>
+            <li><span class="code-hotspot" data-tippy-content="ADMIN ve boton borrar, USER no.">ADMIN y USER ven cosas diferentes.</span></li>
+            <li><span class="code-hotspot" data-tippy-content="URL con ?tipo=Video filtra la lista.">Filtro por tipo o busqueda funcionan.</span></li>
+            <li><span class="code-hotspot" data-tippy-content="Grafico de barras muestra conteo real.">Grafico muestra datos reales de la BD.</span></li>
+            <li><span class="code-hotspot" data-tippy-content="Logout limpia la sesion y vuelve al login.">Cerrar sesion funciona correctamente.</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="footer">
+  <div class="container">
+    <p>Material de apoyo Semana 6 — Persistencia, Login y Roles. Hecho para docencia TIC.</p>
+  </div>
+</footer>
+
+<!-- ═══════════ MODAL: Code Help ═══════════ -->
+<div class="modal fade" id="codeHelpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Explicacion de linea</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body"><p id="codeHelpText" class="mb-0"></p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* highlight + tippy + mermaid */
+if(window.hljs) hljs.highlightAll();
+if(window.tippy) tippy('[data-tippy-content]',{theme:'light',maxWidth:300});
+mermaid.initialize({startOnLoad:true});
+
+/* ── Login demo ── */
+function demoLogin(){
+  const u=document.getElementById('demoUser').value.trim();
+  const p=document.getElementById('demoPass').value.trim();
+  const r=document.getElementById('loginResult');
+  r.style.display='block';
+  if(u==='admin'&&p==='admin123'){
+    r.innerHTML='<div class="alert alert-success mb-0"><strong>Bienvenido, admin!</strong> Rol: <span class="role-badge role-admin">ADMIN</span> — Acceso total.</div>';
+  } else if(u==='docente'&&p==='docente123'){
+    r.innerHTML='<div class="alert alert-success mb-0"><strong>Bienvenido, docente!</strong> Rol: <span class="role-badge role-user">USER</span> — Acceso limitado.</div>';
+  } else {
+    r.innerHTML='<div class="alert alert-danger mb-0">Usuario o contrasena incorrecta. Intenta con <strong>admin/admin123</strong> o <strong>docente/docente123</strong>.</div>';
+  }
+}
+
+/* ── Role sim ── */
+function simRole(role){
+  const v=document.getElementById('simView');
+  if(role==='admin'){
+    v.innerHTML=`
+      <div class="mb-2"><strong>Vista como <span class="role-badge role-admin">ADMIN</span></strong></div>
+      <nav class="mb-2"><a href="#" class="me-2">Inicio</a> | <a href="#" class="me-2">Recursos</a> | <a href="#" class="me-2">Crear nuevo</a> | <a href="#" class="me-2 text-danger">Panel Admin</a> | <a href="#" class="me-2">Estadisticas</a> | <a href="#">Cerrar sesion</a></nav>
+      <table class="table table-sm mt-2"><thead><tr><th>Titulo</th><th>Tipo</th><th>Acciones</th></tr></thead>
+      <tbody><tr><td>Curso Java</td><td>Video</td><td><button class="btn btn-sm btn-warning">Editar</button> <button class="btn btn-sm btn-danger">Borrar</button></td></tr>
+      <tr><td>Guia SQL</td><td>Libro</td><td><button class="btn btn-sm btn-warning">Editar</button> <button class="btn btn-sm btn-danger">Borrar</button></td></tr></tbody></table>`;
+  } else if(role==='user'){
+    v.innerHTML=`
+      <div class="mb-2"><strong>Vista como <span class="role-badge role-user">USER</span></strong></div>
+      <nav class="mb-2"><a href="#" class="me-2">Inicio</a> | <a href="#" class="me-2">Recursos</a> | <a href="#" class="me-2">Crear nuevo</a> | <a href="#">Cerrar sesion</a></nav>
+      <table class="table table-sm mt-2"><thead><tr><th>Titulo</th><th>Tipo</th></tr></thead>
+      <tbody><tr><td>Curso Java</td><td>Video</td></tr><tr><td>Guia SQL</td><td>Libro</td></tr></tbody></table>
+      <div class="small text-muted mt-1"><em>No puedes borrar ni ver estadisticas avanzadas.</em></div>`;
+  } else {
+    v.innerHTML=`
+      <div class="mb-2"><strong>Vista como <span class="role-badge role-viewer">ANONIMO</span></strong></div>
+      <div class="text-center py-4">
+        <div class="h5">Redirigiendo a /login...</div>
+        <p class="text-muted">No tienes permisos. Inicia sesion primero.</p>
+        <button class="btn btn-primary btn-sm" disabled>Iniciar sesion</button>
+      </div>`;
+  }
+}
+
+/* ── Query sim ── */
+function simQuery(type){
+  const r=document.getElementById('queryResult');
+  if(type==='all'){
+    r.innerHTML=`<span style="color:#a5b4fc">URL:</span> /recursos\n<span style="color:#a5b4fc">Metodo:</span> repo.findAll()\n<span style="color:#a5b4fc">SQL:</span> SELECT * FROM RECURSOS_DIDACTICOS\n<span style="color:#22c55e">Resultado:</span> lista completa (todos los registros)`;
+  } else if(type==='tipo'){
+    r.innerHTML=`<span style="color:#a5b4fc">URL:</span> /recursos?tipo=Video\n<span style="color:#a5b4fc">Metodo:</span> repo.findByTipo("Video")\n<span style="color:#a5b4fc">SQL:</span> SELECT * FROM RECURSOS_DIDACTICOS WHERE tipo = 'Video'\n<span style="color:#22c55e">Resultado:</span> solo los recursos de tipo Video`;
+  } else {
+    r.innerHTML=`<span style="color:#a5b4fc">URL:</span> /recursos?buscar=java\n<span style="color:#a5b4fc">Metodo:</span> repo.findByTituloContainingIgnoreCase("java")\n<span style="color:#a5b4fc">SQL:</span> SELECT * FROM RECURSOS_DIDACTICOS WHERE LOWER(titulo) LIKE '%java%'\n<span style="color:#22c55e">Resultado:</span> recursos cuyo titulo contiene "java"`;
+  }
+  r.style.whiteSpace='pre-wrap';
+}
+
+/* ── Charts ── */
+let barChart, doughnutChart;
+function initCharts(){
+  const v=parseInt(document.getElementById('dataVideos').value)||0;
+  const l=parseInt(document.getElementById('dataLibros').value)||0;
+  const a=parseInt(document.getElementById('dataArticulos').value)||0;
+  const colors=['#6366f1','#22c55e','#f59e0b'];
+  barChart=new Chart(document.getElementById('demoBar'),{type:'bar',data:{labels:['Videos','Libros','Articulos'],datasets:[{label:'Cantidad',data:[v,l,a],backgroundColor:colors}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+  doughnutChart=new Chart(document.getElementById('demoDoughnut'),{type:'doughnut',data:{labels:['Videos','Libros','Articulos'],datasets:[{data:[v,l,a],backgroundColor:colors}]},options:{responsive:true}});
+}
+function updateCharts(){
+  const v=parseInt(document.getElementById('dataVideos').value)||0;
+  const l=parseInt(document.getElementById('dataLibros').value)||0;
+  const a=parseInt(document.getElementById('dataArticulos').value)||0;
+  barChart.data.datasets[0].data=[v,l,a]; barChart.update();
+  doughnutChart.data.datasets[0].data=[v,l,a]; doughnutChart.update();
+}
+initCharts();
+
+/* ── Code help modal ── */
+const codeHelpText=document.getElementById('codeHelpText');
+const codeHelpModal=document.getElementById('codeHelpModal');
+function openHelp(el){
+  if(!codeHelpText||!codeHelpModal) return;
+  codeHelpText.textContent=el.getAttribute('data-tippy-content')||'Sin descripcion.';
+  new bootstrap.Modal(codeHelpModal).show();
+}
+document.querySelectorAll('.code-hotspot,.hotspot').forEach(el=>{
+  el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openHelp(el);});
+});
+</script>
+</body>
+</html>

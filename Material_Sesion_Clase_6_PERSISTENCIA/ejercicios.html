@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ejercicios — Sesion 6 (Persistencia, Login y Roles)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">Sesion 6 — Persistencia y Roles</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="clase.html">Guia Docente</a></li>
+        <li class="nav-item"><a class="nav-link active" href="ejercicios.html">Ejercicios</a></li>
+        <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rapido</a></li>
+        <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero py-4">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div>
+        <div class="brand-pill">Guia de ejercicios</div>
+        <h1 class="h2 fw-bold mt-2 mb-1">De login a graficos: paso a paso</h1>
+        <div class="small-muted">Meta: login funcional + roles + filtrado + al menos un grafico con datos reales.</div>
+      </div>
+      <a class="btn btn-primary" href="entregable_equipo.html">Ir al entregable</a>
+    </div>
+    <div class="mt-3">
+      <a class="btn btn-outline-light btn-sm" href="index.html#diagramas">Ver diagramas</a>
+      <a class="btn btn-outline-light btn-sm" href="index.html#quiz">Ir al quiz</a>
+      <a class="btn btn-outline-light btn-sm" href="cheatsheet.html">Resumen rapido</a>
+    </div>
+  </div>
+</header>
+
+<main class="container py-4">
+
+  <div class="callout mb-3">
+    <div class="fw-semibold">Como usar estos ejercicios</div>
+    <div class="small-muted mt-2">Completa en orden. Cada ejercicio construye sobre el anterior. Escribe una frase de "por que" despues de cada paso.</div>
+  </div>
+
+  <div class="hotspot-panel mb-3">
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="Spring Security intercepta cada request y verifica credenciales."></span>
+      <span class="hotspot-label">Login</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="ADMIN y USER ven cosas diferentes en la misma vista."></span>
+      <span class="hotspot-label">Roles</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="findByTipo genera SQL automaticamente."></span>
+      <span class="hotspot-label">Consultas</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="Chart.js dibuja graficos con datos del controlador."></span>
+      <span class="hotspot-label">Graficos</span>
+    </div>
+  </div>
+
+  <div class="row g-3">
+
+    <!-- Ejercicio 1 -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 1 — Agregar dependencias</h2>
+          <p class="small-muted">Agrega las 2 dependencias nuevas al <code>pom.xml</code>:</p>
+          <pre><code class="language-xml"><span class="code-hotspot" data-tippy-content="Habilita login, logout y proteccion de rutas.">&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;</span>
+
+<span class="code-hotspot" data-tippy-content="Permite sec:authorize en Thymeleaf.">&lt;dependency&gt;
+  &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;
+  &lt;artifactId&gt;thymeleaf-extras-springsecurity6&lt;/artifactId&gt;
+&lt;/dependency&gt;</span></code></pre>
+          <div class="callout warning">
+            <div class="fw-semibold">Antes de continuar</div>
+            <div class="small-muted mt-2">Ejecuta <code>./mvnw clean</code> y <code>./mvnw spring-boot:run</code>. Veras que Spring bloquea todo con un login por defecto.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 2 -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 2 — Crear SeguridadConfig</h2>
+          <p class="small-muted">Crea el archivo en <code>configuracion/SeguridadConfig.java</code>:</p>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Paquete de configuracion.">package com.tugrupo.tuapp.configuracion;</span>
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.*;
+import org.springframework.security.config.annotation.web.configuration.*;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.security.crypto.bcrypt.*;
+import org.springframework.security.crypto.password.*;
+import org.springframework.security.provisioning.*;
+import org.springframework.security.web.*;
+
+<span class="code-hotspot" data-tippy-content="Combinacion obligatoria.">@Configuration
+@EnableWebSecurity</span>
+public class SeguridadConfig {
+
+  @Bean
+  public SecurityFilterChain filtro(HttpSecurity http)
+      throws Exception {
+    http
+      .authorizeHttpRequests(auth -> auth
+        <span class="code-hotspot" data-tippy-content="Rutas publicas.">.requestMatchers("/","/css/**","/login").permitAll()</span>
+        <span class="code-hotspot" data-tippy-content="Solo ADMIN.">.requestMatchers("/admin/**","/recursos/borrar/**",
+            "/recursos/estadisticas").hasRole("ADMIN")</span>
+        <span class="code-hotspot" data-tippy-content="Todo lo demas requiere login.">.anyRequest().authenticated()</span>
+      )
+      .formLogin(form -> form
+        <span class="code-hotspot" data-tippy-content="Pagina personalizada.">.loginPage("/login")</span>
+        .defaultSuccessUrl("/recursos", true)
+        .permitAll()
+      )
+      .logout(logout -> logout
+        .logoutSuccessUrl("/login?logout")
+        .permitAll()
+      );
+    return http.build();
+  }
+
+  @Bean
+  public UserDetailsService usuarios() {
+    UserDetails admin = User.builder()
+      .username("admin")
+      <span class="code-hotspot" data-tippy-content="SIEMPRE cifrada.">.password(cifrador().encode("admin123"))</span>
+      .roles("ADMIN")
+      .build();
+    UserDetails docente = User.builder()
+      .username("docente")
+      .password(cifrador().encode("docente123"))
+      .roles("USER")
+      .build();
+    return new InMemoryUserDetailsManager(admin, docente);
+  }
+
+  @Bean
+  public PasswordEncoder cifrador() {
+    return new BCryptPasswordEncoder();
+  }
+}</code></pre>
+          <div class="small-muted">Explica con una frase: &iquest;por que las contrasenas van cifradas?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 3 -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 3 — Controlador y vista de login</h2>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Controlador de login.">@Controller</span>
+public class LoginControlador {
+  @GetMapping("/login")
+  public String login() {
+    return "login";
+  }
+}</code></pre>
+          <p class="small-muted mt-2">Crea <code>templates/login.html</code>:</p>
+          <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html xmlns:th="http://www.thymeleaf.org"&gt;
+&lt;head&gt;
+  &lt;title&gt;Iniciar sesion&lt;/title&gt;
+  &lt;link href="/css/estilos.css" rel="stylesheet" /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="login-container"&gt;
+    &lt;h2&gt;Iniciar sesion&lt;/h2&gt;
+    <span class="code-hotspot" data-tippy-content="Mensaje si las credenciales fallan.">&lt;div th:if="${param.error}" class="alerta-error"&gt;
+      Usuario o contrasena incorrecta.
+    &lt;/div&gt;</span>
+    <span class="code-hotspot" data-tippy-content="Mensaje al cerrar sesion.">&lt;div th:if="${param.logout}" class="alerta-exito"&gt;
+      Sesion cerrada.
+    &lt;/div&gt;</span>
+    &lt;form th:action="@{/login}" method="post"&gt;
+      &lt;label&gt;Usuario&lt;/label&gt;
+      <span class="code-hotspot" data-tippy-content="DEBE llamarse username.">&lt;input type="text" name="username" required /&gt;</span>
+      &lt;label&gt;Contrasena&lt;/label&gt;
+      <span class="code-hotspot" data-tippy-content="DEBE llamarse password.">&lt;input type="password" name="password" required /&gt;</span>
+      &lt;button type="submit"&gt;Entrar&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          <div class="callout success">
+            <div class="fw-semibold">Evidencia</div>
+            <div class="small-muted mt-2">Ingresa como admin y como docente. Ambos deben ver <code>/recursos</code>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 4 -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 4 — Renderizado condicional</h2>
+          <p class="small-muted">En <code>lista.html</code>, agrega el namespace y condicionales:</p>
+          <pre><code class="language-html">&lt;html xmlns:th="http://www.thymeleaf.org"
+      <span class="code-hotspot" data-tippy-content="Namespace obligatorio.">xmlns:sec="http://www.thymeleaf.org/extras/spring-security"</span>&gt;
+
+&lt;!-- Barra de navegacion --&gt;
+&lt;nav&gt;
+  <span class="code-hotspot" data-tippy-content="Muestra nombre del usuario.">&lt;span sec:authorize="isAuthenticated()"&gt;
+    Hola, &lt;b sec:authentication="name"&gt;&lt;/b&gt;
+  &lt;/span&gt;</span>
+
+  <span class="code-hotspot" data-tippy-content="Solo ADMIN ve estadisticas.">&lt;a sec:authorize="hasRole('ADMIN')"
+     href="/recursos/estadisticas"&gt;Estadisticas&lt;/a&gt;</span>
+
+  &lt;form th:action="@{/logout}" method="post" style="display:inline"&gt;
+    &lt;button type="submit"&gt;Cerrar sesion&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/nav&gt;
+
+&lt;!-- En la tabla de recursos --&gt;
+&lt;tr th:each="r : ${recursos}"&gt;
+  &lt;td th:text="${r.titulo}"&gt;&lt;/td&gt;
+  &lt;td th:text="${r.tipo}"&gt;&lt;/td&gt;
+  <span class="code-hotspot" data-tippy-content="Boton borrar solo para ADMIN.">&lt;td sec:authorize="hasRole('ADMIN')"&gt;
+    &lt;a th:href="@{/recursos/borrar/{id}(id=${r.id})}"&gt;
+      Borrar
+    &lt;/a&gt;
+  &lt;/td&gt;</span>
+&lt;/tr&gt;</code></pre>
+          <div class="callout">
+            <div class="fw-semibold">Prueba</div>
+            <div class="small-muted mt-2">Inicia como <strong>admin</strong>: debes ver "Borrar" y "Estadisticas". Inicia como <strong>docente</strong>: no deben aparecer.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 5 -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 5 — Consultas personalizadas</h2>
+          <p class="small-muted">Agrega metodos al repositorio:</p>
+          <pre><code class="language-java">public interface RecursoDidacticoRepositorio
+    extends JpaRepository&lt;RecursoDidactico, Long&gt; {
+
+  <span class="code-hotspot" data-tippy-content="Filtra por tipo exacto.">List&lt;RecursoDidactico&gt; findByTipo(String tipo);</span>
+  <span class="code-hotspot" data-tippy-content="Busca titulo parcial (sin importar mayusculas).">List&lt;RecursoDidactico&gt; findByTituloContainingIgnoreCase(
+      String palabra);</span>
+  <span class="code-hotspot" data-tippy-content="Cuenta por tipo.">long countByTipo(String tipo);</span>
+}</code></pre>
+          <p class="small-muted mt-2">Modifica el controlador para aceptar filtros:</p>
+          <pre><code class="language-java">@GetMapping
+public String listar(
+    <span class="code-hotspot" data-tippy-content="Parametro opcional en la URL.">@RequestParam(required = false) String tipo,</span>
+    @RequestParam(required = false) String buscar,
+    Model model) {
+
+  List&lt;RecursoDidactico&gt; recursos;
+  if (tipo != null && !tipo.isEmpty()) {
+    recursos = repo.findByTipo(tipo);
+  } else if (buscar != null && !buscar.isEmpty()) {
+    recursos = repo.findByTituloContainingIgnoreCase(buscar);
+  } else {
+    recursos = repo.findAll();
+  }
+  model.addAttribute("recursos", recursos);
+  return "recursos/lista";
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 6 -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 6 — Formulario de busqueda</h2>
+          <p class="small-muted">En <code>lista.html</code>, agrega antes de la tabla:</p>
+          <pre><code class="language-html">&lt;form th:action="@{/recursos}" method="get"
+      class="buscador"&gt;
+  <span class="code-hotspot" data-tippy-content="Campo de texto libre.">&lt;input type="text" name="buscar"
+    placeholder="Buscar por titulo..." /&gt;</span>
+
+  <span class="code-hotspot" data-tippy-content="Selector de tipo.">&lt;select name="tipo"&gt;
+    &lt;option value=""&gt;Todos&lt;/option&gt;
+    &lt;option value="Video"&gt;Video&lt;/option&gt;
+    &lt;option value="Libro"&gt;Libro&lt;/option&gt;
+    &lt;option value="Articulo"&gt;Articulo&lt;/option&gt;
+  &lt;/select&gt;</span>
+
+  &lt;button type="submit"&gt;Filtrar&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          <div class="callout success">
+            <div class="fw-semibold">Evidencia</div>
+            <div class="small-muted mt-2">Crea 6+ recursos de distintos tipos. Filtra por "Video" y busca "java". Ambos deben funcionar.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 7 -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 7 — Ruta de estadisticas</h2>
+          <p class="small-muted">En el controlador:</p>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Ruta protegida para ADMIN.">@GetMapping("/estadisticas")</span>
+public String estadisticas(Model model) {
+  model.addAttribute("videos", repo.countByTipo("Video"));
+  model.addAttribute("libros", repo.countByTipo("Libro"));
+  model.addAttribute("articulos", repo.countByTipo("Articulo"));
+  model.addAttribute("total", repo.count());
+  return "recursos/estadisticas";
+}</code></pre>
+          <div class="small-muted">Explica: &iquest;por que esta ruta solo debe ser visible para ADMIN?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 8 -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 8 — Grafico con Chart.js</h2>
+          <p class="small-muted">Crea <code>templates/recursos/estadisticas.html</code>:</p>
+          <pre><code class="language-html">&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;
+
+&lt;h2&gt;Estadisticas de recursos&lt;/h2&gt;
+&lt;p&gt;Total: &lt;span th:text="${total}"&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;canvas id="miGrafico" width="400" height="200"&gt;&lt;/canvas&gt;
+
+<span class="code-hotspot" data-tippy-content="th:inline=javascript permite inyectar datos.">&lt;script th:inline="javascript"&gt;</span>
+  const v = [[${videos}]];
+  const l = [[${libros}]];
+  const a = [[${articulos}]];
+
+  new Chart(document.getElementById('miGrafico'), {
+    type: 'bar',
+    data: {
+      labels: ['Videos', 'Libros', 'Articulos'],
+      datasets: [{
+        label: 'Cantidad',
+        data: [v, l, a],
+        backgroundColor: ['#6366f1','#22c55e','#f59e0b']
+      }]
+    }
+  });
+&lt;/script&gt;</code></pre>
+          <div class="callout success">
+            <div class="fw-semibold">Bonus</div>
+            <div class="small-muted mt-2">Agrega un segundo grafico de tipo <code>'doughnut'</code> debajo del de barras.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 9 -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 9 — Consola H2 y verificacion</h2>
+          <p class="small-muted">Abre <code>http://localhost:8080/h2-console</code> y ejecuta estas consultas:</p>
+          <pre><code class="language-sql"><span class="code-hotspot" data-tippy-content="Verifica todos los registros.">SELECT * FROM RECURSOS_DIDACTICOS;</span>
+
+<span class="code-hotspot" data-tippy-content="Verifica el conteo por tipo.">SELECT tipo, COUNT(*) as total
+FROM RECURSOS_DIDACTICOS
+GROUP BY tipo;</span>
+
+<span class="code-hotspot" data-tippy-content="Busca por texto parcial.">SELECT * FROM RECURSOS_DIDACTICOS
+WHERE LOWER(titulo) LIKE '%java%';</span></code></pre>
+          <div class="callout">
+            <div class="fw-semibold">Reflexion</div>
+            <div class="small-muted mt-2">Compara el resultado de la consulta SQL con lo que muestra el filtro en la web. &iquest;Son iguales? Si no, &iquest;donde esta el error?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ejercicio 10 -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h5 section-title">Ejercicio 10 — Diagnostico de errores</h2>
+          <p class="small-muted">Resuelve usando el flujo de 4 pasos:</p>
+          <ol>
+            <li>Leer el mensaje del log/navegador.</li>
+            <li>Identificar archivo o ruta mencionada.</li>
+            <li>Comparar con la configuracion de seguridad y el controlador.</li>
+            <li>Reintentar y documentar.</li>
+          </ol>
+          <div class="row g-3 mt-2">
+            <div class="col-md-4">
+              <div class="callout danger">
+                <div class="fw-semibold">Error 403</div>
+                <div class="small-muted mt-2">&iquest;El usuario tiene login pero no el rol correcto? Revisa las reglas en <code>SeguridadConfig</code>.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="callout warning">
+                <div class="fw-semibold">Login loop</div>
+                <div class="small-muted mt-2">&iquest;Olvidaste <code>.permitAll()</code> en la ruta de login?</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="callout">
+                <div class="fw-semibold">sec: no funciona</div>
+                <div class="small-muted mt-2">&iquest;Falta la dependencia <code>thymeleaf-extras-springsecurity6</code> o el namespace <code>xmlns:sec</code>?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="py-4 border-top bg-white">
+  <div class="container small-muted">Ejercicios — Sesion 6 · Entrega en <a href="entregable_equipo.html">entregable_equipo.html</a></div>
+</footer>
+
+<div class="modal fade" id="codeHelpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Explicacion de linea</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body"><p id="codeHelpText" class="mb-0"></p></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+if(window.hljs) hljs.highlightAll();
+if(window.tippy) tippy('[data-tippy-content]',{theme:'light',maxWidth:280});
+const codeHelpText=document.getElementById('codeHelpText');
+const codeHelpModal=document.getElementById('codeHelpModal');
+function openHelp(el){if(!codeHelpText||!codeHelpModal)return;codeHelpText.textContent=el.getAttribute('data-tippy-content')||'Sin descripcion.';new bootstrap.Modal(codeHelpModal).show();}
+document.querySelectorAll('.code-hotspot,.hotspot').forEach(el=>{el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openHelp(el);});});
+</script>
+</body>
+</html>

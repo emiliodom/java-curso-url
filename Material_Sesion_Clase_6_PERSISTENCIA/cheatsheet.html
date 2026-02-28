@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resumen rapido — Sesion 6 (Persistencia, Login y Roles)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">Sesion 6 — Persistencia y Roles</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="clase.html">Guia Docente</a></li>
+        <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+        <li class="nav-item"><a class="nav-link active" href="cheatsheet.html">Resumen rapido</a></li>
+        <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero py-4">
+  <div class="container">
+    <div class="brand-pill">Resumen rapido</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Login, Roles, Consultas y Graficos</h1>
+    <div class="small-muted">Referencia rapida para la Semana 6. Imprime o consulta durante la practica.</div>
+  </div>
+</header>
+
+<main class="container py-4">
+
+  <div class="hotspot-panel mb-3">
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="Dependencia que habilita login, logout y roles."></span>
+      <span class="hotspot-label">spring-boot-starter-security</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="Permite usar sec:authorize para mostrar/ocultar."></span>
+      <span class="hotspot-label">thymeleaf-extras-springsecurity6</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="Libreria JavaScript para graficos."></span>
+      <span class="hotspot-label">Chart.js (CDN)</span>
+    </div>
+  </div>
+
+  <div class="row g-3">
+
+    <!-- Columna izquierda -->
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h5 section-title">Anotaciones y clases clave</h2>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Marca la clase como configuracion.">@Configuration</span>
+<span class="code-hotspot" data-tippy-content="Habilita seguridad web.">@EnableWebSecurity</span>
+<span class="code-hotspot" data-tippy-content="Define un componente gestionado por Spring.">@Bean</span>
+<span class="code-hotspot" data-tippy-content="Interfaz de Spring Security para usuarios.">UserDetailsService</span>
+<span class="code-hotspot" data-tippy-content="Cifra contrasenas.">BCryptPasswordEncoder</span>
+<span class="code-hotspot" data-tippy-content="Cadena de filtros de seguridad.">SecurityFilterChain</span></code></pre>
+          <ul class="small-muted mb-0">
+            <li><strong>@Configuration</strong>: clase que configura Spring.</li>
+            <li><strong>@EnableWebSecurity</strong>: activa el login.</li>
+            <li><strong>@Bean</strong>: registra un objeto para que Spring lo use.</li>
+            <li><strong>SecurityFilterChain</strong>: define reglas de acceso.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Thymeleaf con Security</h2>
+          <pre><code class="language-html"><span class="code-hotspot" data-tippy-content="Namespace obligatorio.">&lt;html xmlns:sec="http://www.thymeleaf.org/extras/spring-security"&gt;</span>
+
+<span class="code-hotspot" data-tippy-content="Muestra solo para ADMIN.">&lt;div sec:authorize="hasRole('ADMIN')"&gt;...&lt;/div&gt;</span>
+<span class="code-hotspot" data-tippy-content="Muestra para USER.">&lt;div sec:authorize="hasRole('USER')"&gt;...&lt;/div&gt;</span>
+<span class="code-hotspot" data-tippy-content="Muestra para cualquier usuario con sesion.">&lt;div sec:authorize="isAuthenticated()"&gt;...&lt;/div&gt;</span>
+<span class="code-hotspot" data-tippy-content="Muestra el nombre del usuario.">&lt;span sec:authentication="name"&gt;&lt;/span&gt;</span></code></pre>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Metodos de consulta JPA</h2>
+          <pre><code class="language-java"><span class="code-hotspot" data-tippy-content="Busca por un campo exacto.">findByTipo(String tipo)</span>
+<span class="code-hotspot" data-tippy-content="Busca boolean true.">findByDisponibleTrue()</span>
+<span class="code-hotspot" data-tippy-content="Busca por texto parcial.">findByTituloContainingIgnoreCase(String t)</span>
+<span class="code-hotspot" data-tippy-content="Cuenta registros por tipo.">countByTipo(String tipo)</span>
+<span class="code-hotspot" data-tippy-content="Cuenta todo.">count()</span></code></pre>
+          <div class="small-muted">Spring lee el nombre y genera el SQL automaticamente.</div>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Dependencias nuevas (pom.xml)</h2>
+          <pre><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;
+  &lt;artifactId&gt;thymeleaf-extras-springsecurity6&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h5 section-title">Usuarios y roles (en memoria)</h2>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Usuario</th><th>Contrasena</th><th>Rol</th><th>Permisos</th></tr></thead>
+              <tbody>
+                <tr><td>admin</td><td>admin123</td><td><span class="role-badge role-admin">ADMIN</span></td><td>CRUD completo + estadisticas</td></tr>
+                <tr><td>docente</td><td>docente123</td><td><span class="role-badge role-user">USER</span></td><td>Listar + crear</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Rutas y permisos</h2>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Ruta</th><th>Metodo</th><th>Acceso</th></tr></thead>
+              <tbody>
+                <tr><td>/</td><td>GET</td><td>Publico</td></tr>
+                <tr><td>/login</td><td>GET/POST</td><td>Publico</td></tr>
+                <tr><td>/recursos</td><td>GET</td><td>Autenticado</td></tr>
+                <tr><td>/recursos/nuevo</td><td>GET</td><td>Autenticado</td></tr>
+                <tr><td>/recursos</td><td>POST</td><td>Autenticado</td></tr>
+                <tr><td>/recursos/borrar/{id}</td><td>GET</td><td><span class="role-badge role-admin">ADMIN</span></td></tr>
+                <tr><td>/recursos/estadisticas</td><td>GET</td><td><span class="role-badge role-admin">ADMIN</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Errores comunes</h2>
+          <ul class="mb-0">
+            <li><strong>403 Forbidden:</strong> tiene login, pero no el rol necesario.</li>
+            <li><strong>302 loop en /login:</strong> no agregaste <code>.permitAll()</code> a la ruta de login.</li>
+            <li><strong>sec: no funciona:</strong> falta <code>thymeleaf-extras-springsecurity6</code> o el namespace <code>xmlns:sec</code>.</li>
+            <li><strong>Password error:</strong> no usaste <code>BCryptPasswordEncoder</code> para cifrar.</li>
+            <li><strong>Grafico vacio:</strong> el controlador no pasa los conteos con <code>model.addAttribute</code>.</li>
+            <li><strong>findBy... no funciona:</strong> el nombre del metodo no coincide con el campo de la entidad.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Consultas SQL en consola H2</h2>
+          <pre><code class="language-sql"><span class="code-hotspot" data-tippy-content="Todos los registros.">SELECT * FROM RECURSOS_DIDACTICOS;</span>
+<span class="code-hotspot" data-tippy-content="Cuenta por tipo.">SELECT tipo, COUNT(*) FROM RECURSOS_DIDACTICOS GROUP BY tipo;</span>
+<span class="code-hotspot" data-tippy-content="Busca por titulo.">SELECT * FROM RECURSOS_DIDACTICOS WHERE LOWER(titulo) LIKE '%java%';</span>
+<span class="code-hotspot" data-tippy-content="Solo disponibles.">SELECT * FROM RECURSOS_DIDACTICOS WHERE disponible = TRUE;</span></code></pre>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Comandos utiles</h2>
+          <pre><code class="language-bash"><span class="code-hotspot" data-tippy-content="Limpia y recompila.">./mvnw clean</span>
+<span class="code-hotspot" data-tippy-content="Arranca la app.">./mvnw spring-boot:run</span>
+<span class="code-hotspot" data-tippy-content="Modo debug con mas detalle.">./mvnw spring-boot:run -Dspring-boot.run.arguments="--debug"</span></code></pre>
+          <div class="small-muted mt-2">
+            <strong>Rutas locales:</strong><br>
+            Login: <code>http://localhost:8080/login</code><br>
+            Recursos: <code>http://localhost:8080/recursos</code><br>
+            Estadisticas: <code>http://localhost:8080/recursos/estadisticas</code><br>
+            Consola H2: <code>http://localhost:8080/h2-console</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="py-4 border-top bg-white">
+  <div class="container small-muted">Resumen rapido — Sesion 6 · Vuelve a <a href="index.html">inicio</a></div>
+</footer>
+
+<div class="modal fade" id="codeHelpModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Explicacion de linea</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body"><p id="codeHelpText" class="mb-0"></p></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+if(window.hljs) hljs.highlightAll();
+if(window.tippy) tippy('[data-tippy-content]',{theme:'light',maxWidth:280});
+const codeHelpText=document.getElementById('codeHelpText');
+const codeHelpModal=document.getElementById('codeHelpModal');
+function openHelp(el){if(!codeHelpText||!codeHelpModal)return;codeHelpText.textContent=el.getAttribute('data-tippy-content')||'Sin descripcion.';new bootstrap.Modal(codeHelpModal).show();}
+document.querySelectorAll('.code-hotspot,.hotspot').forEach(el=>{el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openHelp(el);});});
+</script>
+</body>
+</html>

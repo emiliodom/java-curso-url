@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entregable — Sesion 6 (Persistencia, Login y Roles)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">Sesion 6 — Persistencia y Roles</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="clase.html">Guia Docente</a></li>
+        <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+        <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rapido</a></li>
+        <li class="nav-item"><a class="nav-link active" href="entregable_equipo.html">Entregable</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero py-4">
+  <div class="container">
+    <div class="brand-pill">Entregable (equipo)</div>
+    <h1 class="h2 fw-bold mt-2 mb-1">Evidencias — Login, Roles y Graficos funcionales</h1>
+    <div class="small-muted">Completar con capturas, links y explicaciones del flujo de seguridad.</div>
+  </div>
+</header>
+
+<main class="container py-4">
+
+  <div class="hotspot-panel mb-3">
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="Capturas claras de login, roles y graficos."></span>
+      <span class="hotspot-label">Evidencias visuales</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="Explicar el flujo como si ensenamoslo a un estudiante."></span>
+      <span class="hotspot-label">Explicacion pedagogica</span>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Columna izquierda -->
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h5 section-title">Datos del equipo</h2>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Curso / Seccion</label>
+              <input class="form-control" placeholder="Programacion I">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Semana</label>
+              <input class="form-control" value="Semana 6">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Integrantes</label>
+              <textarea class="form-control" rows="3" placeholder="Nombre 1
+Nombre 2
+Nombre 3"></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Repositorio / Carpeta del proyecto</label>
+              <input class="form-control" placeholder="Link de GitHub o ruta local">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Checklist tecnico (evidencias)</h2>
+          <h6 class="mt-3">Login y seguridad</h6>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c1">
+            <label class="form-check-label" for="c1">Login funciona con admin y docente.</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c2">
+            <label class="form-check-label" for="c2">Credenciales incorrectas muestran mensaje de error.</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c3">
+            <label class="form-check-label" for="c3">Cerrar sesion funciona y redirige a /login.</label>
+          </div>
+
+          <h6 class="mt-3">Roles y renderizado condicional</h6>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c4">
+            <label class="form-check-label" for="c4">ADMIN ve boton "Borrar" y enlace "Estadisticas".</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c5">
+            <label class="form-check-label" for="c5">USER NO ve boton "Borrar" ni "Estadisticas".</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c6">
+            <label class="form-check-label" for="c6">Se muestra el nombre del usuario conectado.</label>
+          </div>
+
+          <h6 class="mt-3">Consultas y filtrado</h6>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c7">
+            <label class="form-check-label" for="c7">Filtro por tipo funciona (ej: ?tipo=Video).</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c8">
+            <label class="form-check-label" for="c8">Busqueda por titulo funciona (ej: ?buscar=java).</label>
+          </div>
+
+          <h6 class="mt-3">Graficos</h6>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c9">
+            <label class="form-check-label" for="c9">Grafico de barras muestra datos reales de la BD.</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="c10">
+            <label class="form-check-label" for="c10">Hay al menos 6 registros de prueba en la BD.</label>
+          </div>
+
+          <hr class="my-3">
+          <label class="form-label">Links o capturas (pegar aqui)</label>
+          <textarea class="form-control" rows="8" placeholder="- Captura login exitoso (admin)
+- Captura login exitoso (docente)
+- Captura vista ADMIN (con borrar)
+- Captura vista USER (sin borrar)
+- Captura filtro por tipo
+- Captura busqueda
+- Captura grafico
+- Captura consola H2"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h5 section-title">Explicacion del flujo de seguridad (10-15 lineas)</h2>
+          <p class="small-muted">Explica como si ensenamoslo a un grupo de estudiantes de secundaria:</p>
+          <textarea class="form-control" rows="10" placeholder="Ej: Cuando alguien intenta entrar a /recursos sin haber iniciado sesion, Spring Security lo redirige automaticamente a /login. Ahi, el usuario escribe su nombre y contrasena. Spring verifica si existen en la lista de usuarios permitidos..."></textarea>
+          <div class="callout mt-3">
+            <div class="fw-semibold">Preguntas guia</div>
+            <div class="small-muted mt-2">
+              1. &iquest;Que pasa si alguien sin login intenta entrar a /recursos?<br>
+              2. &iquest;Que diferencia hay entre lo que ve ADMIN y USER?<br>
+              3. &iquest;Por que las contrasenas se cifran?<br>
+              4. &iquest;Como funciona findByTipo sin escribir SQL?
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Analogias para ensenar (3 minimo)</h2>
+          <textarea class="form-control" rows="6" placeholder="1) Login es como... (ej: el guardia del edificio)
+2) Roles son como... (ej: llaves de diferentes puertas)
+3) findByTipo es como... (ej: pedir libros de un tema en la biblioteca)"></textarea>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Bitacora de errores (si hubo)</h2>
+          <textarea class="form-control" rows="6" placeholder="1) Que fallo...
+2) Que decia el log...
+3) Que cambiamos...
+4) Resultado..."></textarea>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Rubrica rapida (100 pts)</h2>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th style="min-width:220px">Criterio</th>
+                  <th class="text-center">Logro</th>
+                  <th class="text-center">Proceso</th>
+                  <th class="text-center">No</th>
+                  <th>Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Login funciona (admin + docente)</td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r1"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r1"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r1"></td>
+                  <td>20</td>
+                </tr>
+                <tr>
+                  <td>Renderizado condicional correcto</td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r2"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r2"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r2"></td>
+                  <td>20</td>
+                </tr>
+                <tr>
+                  <td>Filtro/busqueda funciona</td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r3"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r3"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r3"></td>
+                  <td>20</td>
+                </tr>
+                <tr>
+                  <td>Grafico con datos reales</td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r4"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r4"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r4"></td>
+                  <td>20</td>
+                </tr>
+                <tr>
+                  <td>Explicacion + analogias claras</td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r5"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r5"></td>
+                  <td class="text-center"><input class="form-check-input" type="radio" name="r5"></td>
+                  <td>20</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout mt-3">
+            <div class="fw-semibold">Criterio transversal</div>
+            <div class="small-muted mt-2">Debe poder explicar que ve cada rol y por que, sin leer el codigo.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="py-4 border-top bg-white">
+  <div class="container small-muted">Entregable — Sesion 6 · Recomendacion: guardar como PDF o adjuntar capturas.</div>
+</footer>
+
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+tippy('[data-tippy-content]',{theme:'light',maxWidth:280});
+</script>
+</body>
+</html>

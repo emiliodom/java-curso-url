@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guia Docente — Sesion 6 (Persistencia, Login y Roles)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">Sesion 6 — Persistencia y Roles</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="clase.html">Guia Docente</a></li>
+        <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+        <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rapido</a></li>
+        <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero py-4">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div>
+        <div class="brand-pill">Guia Docente</div>
+        <h1 class="h2 fw-bold mt-2 mb-1">Sesion de Clase 6 — Persistencia, Login y Roles</h1>
+        <div class="small-muted">Unidad 6: Login funcional + renderizado condicional + consultas y graficos.</div>
+      </div>
+      <a class="btn btn-outline-light" href="ejercicios.html">Abrir ejercicios</a>
+    </div>
+  </div>
+</header>
+
+<main class="container py-4">
+
+  <!-- Panel de observacion -->
+  <div class="hotspot-panel mb-3">
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="Verifica que el estudiante sabe por que se necesita Spring Security."></span>
+      <span class="hotspot-label">Comprension de seguridad</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="El estudiante puede explicar que ve ADMIN vs USER."></span>
+      <span class="hotspot-label">Renderizado condicional</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="El estudiante entiende que findByTipo genera SQL automaticamente."></span>
+      <span class="hotspot-label">Consultas JPA</span>
+    </div>
+    <div class="hotspot-row">
+      <span class="hotspot" data-tippy-content="El estudiante conecta datos del controlador con Chart.js en la vista."></span>
+      <span class="hotspot-label">Graficos con datos reales</span>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Columna izquierda: objetivos y normas -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h5 section-title">Objetivos (hoy)</h2>
+          <ul class="mb-0">
+            <li>Implementar login con Spring Security.</li>
+            <li>Crear usuarios en memoria con roles (ADMIN, USER).</li>
+            <li>Mostrar/ocultar elementos segun el rol.</li>
+            <li>Buscar y filtrar datos con metodos del repositorio.</li>
+            <li>Mostrar un grafico con datos reales de la BD.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Normas rapidas</h2>
+          <ul class="mb-0">
+            <li>Primero el login funcional, luego estilo.</li>
+            <li>Si falla seguridad, revisar orden de reglas.</li>
+            <li>Las contrasenas SIEMPRE van cifradas.</li>
+            <li>Los campos del form de login se llaman <code>username</code> y <code>password</code>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Caso recomendado</h2>
+          <div class="small-muted">Continuar con "Recursos didacticos" de Semana 5.</div>
+          <ul class="mb-0 mt-2">
+            <li>Agregar login y roles al CRUD existente.</li>
+            <li>ADMIN: CRUD completo + estadisticas.</li>
+            <li>USER: listar + crear.</li>
+            <li>Filtro por tipo y busqueda por titulo.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body">
+          <h2 class="h5 section-title">Errores mas frecuentes</h2>
+          <ul class="mb-0">
+            <li><strong>403 Forbidden:</strong> el usuario tiene login pero no el rol necesario.</li>
+            <li><strong>Login loop:</strong> olvidar <code>.permitAll()</code> en la ruta <code>/login</code>.</li>
+            <li><strong>sec:authorize no funciona:</strong> falta la dependencia <code>thymeleaf-extras-springsecurity6</code> o el namespace.</li>
+            <li><strong>Grafico vacio:</strong> el controlador no envia los conteos al modelo.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: guion -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h4 section-title">Guion sugerido (120-150 min)</h2>
+
+          <div class="accordion" id="acc">
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#c1">
+                  1) Activacion (10 min) — "Quien puede entrar?"
+                </button>
+              </h2>
+              <div id="c1" class="accordion-collapse collapse show" data-bs-parent="#acc">
+                <div class="accordion-body">
+                  <ul>
+                    <li><strong>Pregunta guia:</strong> "Si cualquier persona puede ver los datos de los ninos del dispensario, &iquest;que problema hay?"</li>
+                    <li>Lluvia de ideas: &iquest;por que necesitamos login?</li>
+                    <li>Ejemplo cotidiano: el banco te pide contrasena para ver tu saldo.</li>
+                    <li><strong>Meta del dia:</strong> agregar un sistema de login funcional.</li>
+                  </ul>
+                  <div class="callout">
+                    <strong>Consejo docente:</strong> conectar con el proyecto real del grupo. Los datos de beneficiarios son sensibles.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
+                  2) Dependencias y configuracion (15 min)
+                </button>
+              </h2>
+              <div id="c2" class="accordion-collapse collapse" data-bs-parent="#acc">
+                <div class="accordion-body">
+                  <ul>
+                    <li>Mostrar las 2 nuevas dependencias en <code>pom.xml</code> (Security + Thymeleaf extras).</li>
+                    <li>Preguntar: "&iquest;que pasa si ejecuto la app solo con Security y sin configurar nada?" (Spring genera una contrasena aleatoria en el log).</li>
+                    <li>Demostrar: agregar la dependencia, correr y ver la pantalla de login por defecto.</li>
+                  </ul>
+                  <div class="callout warning">
+                    <strong>Momento aha:</strong> con solo agregar la dependencia, Spring bloquea TODO. Hay que configurar que es publico.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3">
+                  3) Login paso a paso (30 min) — Hands-on
+                </button>
+              </h2>
+              <div id="c3" class="accordion-collapse collapse" data-bs-parent="#acc">
+                <div class="accordion-body">
+                  <ol>
+                    <li><strong>Crear <code>SeguridadConfig.java</code></strong> en carpeta <code>configuracion/</code>.</li>
+                    <li><strong>Definir reglas:</strong> <code>/</code> y <code>/css/**</code> publicos, el resto requiere login.</li>
+                    <li><strong>Definir usuarios:</strong> admin (ADMIN) y docente (USER) en memoria.</li>
+                    <li><strong>Crear <code>LoginControlador.java</code></strong> con ruta GET <code>/login</code>.</li>
+                    <li><strong>Crear <code>templates/login.html</code></strong> con formulario.</li>
+                    <li><strong>Probar:</strong> admin entra, docente entra, credencial incorrecta muestra error.</li>
+                  </ol>
+                  <div class="callout success">
+                    <strong>Evidencia esperada:</strong> login funcional + redireccion a <code>/recursos</code> al iniciar sesion.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c4">
+                  4) Roles y renderizado condicional (25 min)
+                </button>
+              </h2>
+              <div id="c4" class="accordion-collapse collapse" data-bs-parent="#acc">
+                <div class="accordion-body">
+                  <ol>
+                    <li>Agregar namespace <code>sec:</code> al HTML.</li>
+                    <li>Mostrar nombre del usuario con <code>sec:authentication="name"</code>.</li>
+                    <li>Ocultar boton "Borrar" para USER con <code>sec:authorize="hasRole('ADMIN')"</code>.</li>
+                    <li>Agregar enlace a "Estadisticas" visible solo para ADMIN.</li>
+                    <li>Agregar boton "Cerrar sesion" con formulario POST a <code>/logout</code>.</li>
+                  </ol>
+                  <p class="small-muted">Haz la simulacion interactiva del <a href="index.html#condicional">material HTML</a> en pantalla grande para que todos vean.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c5">
+                  5) Consultas y filtrado (20 min)
+                </button>
+              </h2>
+              <div id="c5" class="accordion-collapse collapse" data-bs-parent="#acc">
+                <div class="accordion-body">
+                  <ol>
+                    <li>Agregar metodos al repositorio: <code>findByTipo</code>, <code>findByTituloContainingIgnoreCase</code>.</li>
+                    <li>Modificar controlador para aceptar <code>@RequestParam</code> opcional.</li>
+                    <li>Agregar formulario de busqueda en la vista.</li>
+                    <li>Probar: filtrar por "Video", buscar "java".</li>
+                    <li>Abrir consola H2 y ejecutar <code>SELECT * FROM RECURSOS_DIDACTICOS</code>.</li>
+                  </ol>
+                  <div class="callout">
+                    <strong>Pregunta de reflexion:</strong> "&iquest;por que conviene no escribir SQL directamente sino usar nombres de metodos?"
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c6">
+                  6) Graficos con Chart.js (20 min)
+                </button>
+              </h2>
+              <div id="c6" class="accordion-collapse collapse" data-bs-parent="#acc">
+                <div class="accordion-body">
+                  <ol>
+                    <li>Agregar <code>countByTipo</code> al repositorio.</li>
+                    <li>Crear ruta <code>GET /recursos/estadisticas</code> en el controlador.</li>
+                    <li>Crear vista <code>estadisticas.html</code> con Chart.js.</li>
+                    <li>Probar con datos reales: agregar 5+ recursos de distintos tipos.</li>
+                    <li>Mostrar grafico de barras y de dona lado a lado.</li>
+                  </ol>
+                  <div class="callout success">
+                    <strong>Impacto visual:</strong> cuando el grafico aparece con datos reales, el grupo entiende por que la BD es importante.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c7">
+                  7) Reflexion y cierre (10 min)
+                </button>
+              </h2>
+              <div id="c7" class="accordion-collapse collapse" data-bs-parent="#acc">
+                <div class="accordion-body">
+                  <ul>
+                    <li><strong>Reflexion:</strong> "&iquest;Como explicarias a un companero por que es importante el login?"</li>
+                    <li><strong>Analogia:</strong> escribir 1 analogia para "rol" y 1 analogia para "consulta personalizada".</li>
+                    <li><strong>Adelanto Semana 7:</strong> despliegue (deploy) — llevar la app a internet.</li>
+                    <li><strong>Ticket de salida:</strong> escribir 3 pasos para agregar un nuevo rol al sistema.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /accordion -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="py-4 border-top bg-white">
+  <div class="container small-muted">Guia Docente — Sesion 6 · Vuelve a <a href="index.html">inicio</a></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+if(window.hljs) hljs.highlightAll();
+if(window.tippy) tippy('[data-tippy-content]',{theme:'light',maxWidth:280});
+</script>
+</body>
+</html>
