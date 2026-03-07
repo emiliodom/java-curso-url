@@ -133,7 +133,7 @@
                 <li><strong>Repositorio en GitHub</strong> — todo tu código está subido</li>
                 <li><strong>La app corre en localhost</strong> — sin errores al arrancar</li>
                 <li><strong>Cuenta en Render</strong> — gratuita con GitHub</li>
-                <li><strong>Archivo <code>system.properties</code></strong> — indica la versión de Java</li>
+                <li><strong>Archivo <code>Dockerfile</code></strong> — le dice a Render cómo compilar y ejecutar tu app Java</li>
               </ul>
             </div>
           </div>
@@ -143,8 +143,9 @@
               <h3>📁 Archivos que Render necesita</h3>
               <div class="file-tree">
                 <span class="folder">📂 mi-proyecto/</span><br>
-                ├── <span class="highlight">pom.xml</span> ← Render lo detecta automáticamente<br>
-                ├── <span class="highlight">system.properties</span> ← Versión de Java<br>
+                ├── <span class="highlight">pom.xml</span> ← Dependencias del proyecto<br>
+                ├── <span class="highlight">Dockerfile</span> ← Render lo usa para compilar y ejecutar la app<br>
+                ├── <span class="file">.dockerignore</span> ← Archivos excluidos del build<br>
                 ├── <span class="folder">📂 src/</span><br>
                 │   └── <span class="folder">📂 main/</span><br>
                 │       ├── <span class="folder">📂 java/</span> (tu código)<br>
@@ -158,11 +159,25 @@
 
           <div class="col-lg-6">
             <div class="info-card">
-              <h3>🔧 system.properties</h3>
-              <p>Este archivo le dice a Render qué versión de Java usar. Créalo en la raíz del proyecto:</p>
-              <pre><code class="language-properties">java.runtime.version=17</code></pre>
+              <h3>� Dockerfile</h3>
+              <p>Render <strong>no tiene Java instalado de forma nativa</strong>. Necesitas un <code>Dockerfile</code> que le diga cómo compilar y ejecutar tu app. Créalo en la raíz del proyecto:</p>
+              <pre><code class="language-dockerfile"># Etapa 1: Compilar el proyecto
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
+# Etapa 2: Ejecutar la aplicación
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 10000
+CMD ["java", "-Xmx256m", "-jar", "app.jar"]</code></pre>
               <div class="callout warning">
-                <strong>¡Importante!</strong> Sin este archivo, Render puede usar Java 8 y tu app no arrancará.
+                <strong>¡Importante!</strong> Sin este archivo, Render no puede compilar ni ejecutar tu app Java. Es el equivalente a darle una receta de cocina.
+              </div>
+              <div class="callout mt-2">
+                <strong>¿Qué es un Dockerfile?</strong> Es como una receta paso a paso. La <em>Etapa 1</em> compila tu código (como preparar ingredientes). La <em>Etapa 2</em> empaqueta solo lo necesario para ejecutar (como servir el plato). Esto se llama <strong>multi-stage build</strong>.
               </div>
             </div>
           </div>
@@ -212,7 +227,7 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                 <span class="output">Changes not staged for commit:</span><br>
                 <span class="output">  modified:   src/.../application.properties</span><br>
                 <span class="output">Untracked files:</span><br>
-                <span class="error">  system.properties</span>
+                <span class="error">  Dockerfile</span>
               </div>
               <p class="small-muted mt-2">Los archivos en rojo son nuevos. Los modificados necesitan agregarse.</p>
             </div>
@@ -230,7 +245,7 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                 <span class="output"> 3 files changed, 12 insertions(+)</span>
               </div>
               <div class="callout mt-2">
-                <strong>Regla de oro:</strong> Cada commit debe tener un mensaje claro. "cambios" no sirve. "Agregar system.properties para Java 17" sí.
+                <strong>Regla de oro:</strong> Cada commit debe tener un mensaje claro. "cambios" no sirve. "Agregar Dockerfile para deploy en Render" sí.
               </div>
             </div>
           </div>
@@ -315,28 +330,18 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                       <tr><td><strong>Name</strong></td><td>mi-app-recursos (el nombre que quieras)</td></tr>
                       <tr><td><strong>Region</strong></td><td>Oregon (US West) — el más cercano gratis</td></tr>
                       <tr><td><strong>Branch</strong></td><td>main</td></tr>
-                      <tr><td><strong>Runtime</strong></td><td>Java (detectado automáticamente)</td></tr>
-                      <tr><td><strong>Build Command</strong></td><td><code>./mvnw clean install -DskipTests</code></td></tr>
-                      <tr><td><strong>Start Command</strong></td><td><code>java -jar target/*.jar</code></td></tr>
+                      <tr><td><strong>Language</strong></td><td><strong>Docker</strong> (seleccionar manualmente)</td></tr>
+                      <tr><td><strong>Dockerfile Path</strong></td><td><code>./Dockerfile</code> (detectado automáticamente)</td></tr>
                       <tr><td><strong>Plan</strong></td><td><strong>Free</strong></td></tr>
                     </tbody>
                   </table>
                 </div>
                 <div class="col-md-6">
                   <div class="callout warning">
-                    <strong>Build Command explicado:</strong>
-                    <ul class="mb-0 mt-1">
-                      <li><code>./mvnw</code> — usa el Maven que viene con el proyecto</li>
-                      <li><code>clean install</code> — limpia y compila todo</li>
-                      <li><code>-DskipTests</code> — salta pruebas para ir más rápido</li>
-                    </ul>
+                    <strong>⚠️ ¿Por qué Docker y no Java?</strong> Render <strong>no tiene Java como runtime nativo</strong> (solo soporta Node.js, Python, Ruby, Go, Rust y Elixir). Para Java necesitas un <code>Dockerfile</code> que incluya el JDK.
                   </div>
                   <div class="callout mt-2">
-                    <strong>Start Command explicado:</strong>
-                    <ul class="mb-0 mt-1">
-                      <li><code>java -jar target/*.jar</code> — ejecuta el .jar generado</li>
-                      <li>Es como hacer doble clic para abrir un programa</li>
-                    </ul>
+                    <strong>¿Y el Build/Start Command?</strong> No necesitas configurarlos. Tu <code>Dockerfile</code> ya contiene las instrucciones de compilación (<code>RUN ./mvnw clean package</code>) y de ejecución (<code>CMD java -jar app.jar</code>). Render lee el Dockerfile y hace todo automáticamente.
                   </div>
                 </div>
               </div>
@@ -345,16 +350,19 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
 
           <div class="col-lg-6">
             <div class="info-card">
-              <h3>4. Variables de entorno</h3>
-              <p>En la sección <strong>"Environment"</strong> de Render:</p>
-              <table class="table table-sm">
-                <thead><tr><th>Key</th><th>Value</th></tr></thead>
-                <tbody>
-                  <tr><td><code>JAVA_TOOL_OPTIONS</code></td><td><code>-Xmx256m</code></td></tr>
-                </tbody>
-              </table>
-              <div class="callout warning">
-                <strong>¿Por qué <code>-Xmx256m</code>?</strong> El plan gratuito de Render tiene memoria limitada (512 MB). Con esto le decimos a Java que no use más de 256 MB.
+              <h3>4. Variables de entorno (opcional)</h3>
+              <p>El <code>Dockerfile</code> ya incluye <code>-Xmx256m</code> en el <code>CMD</code>, así que la memoria ya está limitada. <strong>No necesitas agregar variables de entorno obligatorias.</strong></p>
+              <div class="callout">
+                <strong>Opcional:</strong> Si quieres cambiar el límite de memoria sin修改 el Dockerfile, puedes agregar en <strong>Environment</strong>:
+                <table class="table table-sm mt-2 mb-0">
+                  <thead><tr><th>Key</th><th>Value</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>JAVA_TOOL_OPTIONS</code></td><td><code>-Xmx256m</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout warning mt-2">
+                <strong>¿Por qué <code>-Xmx256m</code>?</strong> El plan gratuito de Render tiene memoria limitada (512 MB). Con esto le decimos a Java que no use más de 256 MB, dejando espacio para el sistema operativo.
               </div>
             </div>
           </div>
@@ -473,7 +481,7 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                 <span class="output">class file has wrong version 61.0, should be 52.0</span>
               </div>
               <div class="callout success mt-2">
-                <strong>Solución:</strong> Crear <code>system.properties</code> con <code>java.runtime.version=17</code> en la raíz del proyecto.
+                <strong>Solución:</strong> Verifica que tu <code>Dockerfile</code> use <code>eclipse-temurin:17</code> tanto en la etapa de build como en la de ejecución. Ambas etapas deben usar Java 17.
               </div>
             </div>
           </div>
@@ -498,7 +506,7 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                 <span class="output">Process running memory is larger than limit</span>
               </div>
               <div class="callout success mt-2">
-                <strong>Solución:</strong> Agregar variable de entorno <code>JAVA_TOOL_OPTIONS=-Xmx256m</code> en Render.
+                <strong>Solución:</strong> Verifica que tu <code>Dockerfile</code> incluya <code>-Xmx256m</code> en el <code>CMD</code>. También puedes agregar la variable <code>JAVA_TOOL_OPTIONS=-Xmx256m</code> en Render.
               </div>
             </div>
           </div>
@@ -510,7 +518,7 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                 <span class="error">bash: ./mvnw: Permission denied</span>
               </div>
               <div class="callout success mt-2">
-                <strong>Solución:</strong> Ejecutar en tu terminal local:<br>
+                <strong>Solución:</strong> Agrega <code>RUN chmod +x mvnw</code> antes del <code>RUN ./mvnw</code> en tu Dockerfile. O en tu terminal local:<br>
                 <code>git update-index --chmod=+x mvnw</code><br>
                 <code>git commit -m "Fix mvnw permissions"</code><br>
                 <code>git push origin main</code>
@@ -572,8 +580,8 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
 flowchart LR
   A[Tu PC] -->|git push| B[GitHub]
   B -->|webhook| C[Render]
-  C -->|mvnw clean install| D[Build]
-  D -->|java -jar| E[App en vivo]
+  C -->|docker build| D[Build]
+  D -->|docker run| E[App en vivo]
   E -->|URL pública| F[Usuarios]
             </div>
           </div>
@@ -656,10 +664,10 @@ flowchart LR
           </div>
 
           <div id="q2" class="quiz-q mb-4">
-            <h5>2. ¿Para qué sirve el archivo <code>system.properties</code>?</h5>
+            <h5>2. ¿Para qué sirve el <code>Dockerfile</code>?</h5>
             <div class="quiz-options">
               <label><input type="radio" name="q2" value="a"> Para configurar la base de datos</label>
-              <label><input type="radio" name="q2" value="b"> Para indicar la versión de Java a Render</label>
+              <label><input type="radio" name="q2" value="b"> Para decirle a Render cómo compilar y ejecutar tu app Java</label>
               <label><input type="radio" name="q2" value="c"> Para definir las rutas del controlador</label>
               <label><input type="radio" name="q2" value="d"> Para guardar contraseñas</label>
             </div>
@@ -719,7 +727,7 @@ flowchart LR
               <div id="checklistItems">
                 <div class="form-check mb-2">
                   <input class="form-check-input" type="checkbox" id="ck1">
-                  <label class="form-check-label" for="ck1"><strong>system.properties</strong> creado con <code>java.runtime.version=17</code></label>
+                  <label class="form-check-label" for="ck1"><strong>Dockerfile</strong> creado en la raíz del proyecto (multi-stage build con Java 17)</label>
                 </div>
                 <div class="form-check mb-2">
                   <input class="form-check-input" type="checkbox" id="ck2">
@@ -747,19 +755,15 @@ flowchart LR
                 </div>
                 <div class="form-check mb-2">
                   <input class="form-check-input" type="checkbox" id="ck8">
-                  <label class="form-check-label" for="ck8"><strong>Web Service</strong> creado en Render</label>
+                  <label class="form-check-label" for="ck8"><strong>Web Service</strong> creado en Render con Language = <strong>Docker</strong></label>
                 </div>
                 <div class="form-check mb-2">
                   <input class="form-check-input" type="checkbox" id="ck9">
-                  <label class="form-check-label" for="ck9"><strong>Build Command:</strong> <code>./mvnw clean install -DskipTests</code></label>
+                  <label class="form-check-label" for="ck9"><strong>Dockerfile Path:</strong> <code>./Dockerfile</code> (detectado automáticamente)</label>
                 </div>
                 <div class="form-check mb-2">
                   <input class="form-check-input" type="checkbox" id="ck10">
-                  <label class="form-check-label" for="ck10"><strong>Start Command:</strong> <code>java -jar target/*.jar</code></label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="ck11">
-                  <label class="form-check-label" for="ck11"><strong>Variable:</strong> <code>JAVA_TOOL_OPTIONS=-Xmx256m</code></label>
+                  <label class="form-check-label" for="ck10"><strong>Memoria limitada:</strong> <code>-Xmx256m</code> en el CMD del Dockerfile</label>
                 </div>
                 <div class="form-check mb-2">
                   <input class="form-check-input" type="checkbox" id="ck12">
@@ -768,7 +772,7 @@ flowchart LR
               </div>
               <hr>
               <div class="d-flex justify-content-between align-items-center">
-                <span id="checklistProgress" class="fw-bold">0 / 12 completos</span>
+                <span id="checklistProgress" class="fw-bold">0 / 11 completos</span>
                 <span id="checklistEmoji" style="font-size:2rem">🚀</span>
               </div>
               <div class="progress mt-2" style="height:10px">
@@ -782,7 +786,7 @@ flowchart LR
               <h3>Resumen de comandos</h3>
               <div class="terminal-sim">
                 <span class="comment"># 1. Preparar</span><br>
-                <span class="prompt">$</span> echo "java.runtime.version=17" > system.properties<br><br>
+                <span class="prompt">$</span> echo 'FROM maven:3.9...' > Dockerfile<br><br>
                 <span class="comment"># 2. Subir</span><br>
                 <span class="prompt">$</span> git add .<br>
                 <span class="prompt">$</span> git commit -m "Deploy ready"<br>
@@ -866,7 +870,7 @@ flowchart LR
 
       if (cmd === 'git status') {
         termState.status = true;
-        appendTerm(`<span class="prompt">$</span> git status<br><span class="output">On branch main</span><br><span class="output">Changes not staged for commit:</span><br><span class="output">  modified: application.properties</span><br><span class="error">  new file: system.properties</span>`);
+        appendTerm(`<span class="prompt">$</span> git status<br><span class="output">On branch main</span><br><span class="output">Changes not staged for commit:</span><br><span class="output">  modified: application.properties</span><br><span class="error">  new file: Dockerfile</span>`);
       } else if (cmd === 'git add .') {
         termState.added = true;
         appendTerm(`<span class="prompt">$</span> git add .<br><span class="success">Archivos agregados al staging area.</span>`);
@@ -915,7 +919,7 @@ flowchart LR
     const answers = { q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'b' };
     const explanations = {
       q1: 'El orden es: add (agregar archivos), commit (guardar snapshot), push (enviar a GitHub).',
-      q2: 'system.properties le dice a Render qué versión de Java usar. Sin él, puede fallar el build.',
+      q2: 'Render no tiene Java nativo. El Dockerfile contiene las instrucciones para compilar (maven) y ejecutar (java -jar) tu app dentro de un contenedor Docker.',
       q3: '${PORT:8080} usa la variable PORT de Render si existe; si no, usa 8080 (para desarrollo local).',
       q4: 'Render tiene un webhook que detecta cada push y dispara un nuevo build automáticamente.',
       q5: 'El plan gratuito tiene 512 MB. Con -Xmx256m limitamos Java para que no consuma toda la memoria.'

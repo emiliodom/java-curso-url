@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resumen rápido — Sesión 8 (Seguridad, QA y Mantenimiento)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">Sesión 8 — Seguridad, QA y Mantenimiento</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="clase.html">Guía Docente</a></li>
+          <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+          <li class="nav-item"><a class="nav-link active" href="cheatsheet.html">Resumen rápido</a></li>
+          <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero py-4">
+    <div class="container">
+      <div class="brand-pill">Resumen rápido</div>
+      <h1 class="h2 fw-bold mt-2 mb-1">Seguridad, campos calculados y QA</h1>
+      <div class="small-muted" style="color:#c7d2fe">Referencia rápida para proteger tu app, agregar campos inteligentes y mantener calidad.</div>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <div class="hotspot-panel mb-3">
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Spring Security protege TODO al agregar la dependencia."></span>
+        <span class="hotspot-label">Security bloquea todo por defecto</span>
+      </div>
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="@Transient = campo que NO se guarda en la BD."></span>
+        <span class="hotspot-label">@Transient para campos calculados</span>
+      </div>
+      <div class="hotspot-row">
+        <span class="hotspot" data-tippy-content="Siempre probar en localhost antes de hacer push."></span>
+        <span class="hotspot-label">QA antes de push</span>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <!-- Columna izquierda -->
+      <div class="col-lg-6">
+
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h5 section-title">Dependencias de seguridad (pom.xml)</h2>
+            <pre><code class="language-xml">&lt;!-- Autenticación y autorización --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- sec:authorize en Thymeleaf (opcional) --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;
+    &lt;artifactId&gt;thymeleaf-extras-springsecurity6&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">SecurityConfig.java (mínimo)</h2>
+            <pre><code class="language-java">@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filtro(HttpSecurity http)
+            throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/css/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/recursos", true)
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
+            );
+        return http.build();
+    }
+
+    @Bean
+    public UserDetailsService usuarios() {
+        var user = User.builder()
+            .username("docente")
+            .password(encoder().encode("1234"))
+            .roles("USER").build();
+        var admin = User.builder()
+            .username("admin")
+            .password(encoder().encode("admin123"))
+            .roles("ADMIN","USER").build();
+        return new InMemoryUserDetailsManager(user, admin);
+    }
+
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Getters calculados (@Transient)</h2>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Getter</th><th>Código</th><th>¿En BD?</th></tr></thead>
+                <tbody>
+                  <tr><td><code>getTotal()</code></td><td><code>return precioUnitario * cantidad;</code></td><td>No</td></tr>
+                  <tr><td><code>getEdad()</code></td><td><code>Period.between(fechaNac, now()).getYears();</code></td><td>No</td></tr>
+                  <tr><td><code>getEstado()</code></td><td><code>if (cantidad==0) "Agotado"; ...</code></td><td>No</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout mt-2">
+              <strong>Regla:</strong> Si el valor depende de otros campos y cambia dinámicamente → <code>@Transient</code> getter. Nunca lo guardes en BD.
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Setters con transformación</h2>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Setter</th><th>Transformación</th><th>Resultado</th></tr></thead>
+                <tbody>
+                  <tr><td><code>setNombre()</code></td><td><code>trim().toUpperCase()</code></td><td>" juan " → "JUAN"</td></tr>
+                  <tr><td><code>setEmail()</code></td><td><code>trim().toLowerCase()</code></td><td>" Juan@URL.edu " → "juan@url.edu"</td></tr>
+                  <tr><td><code>setTelefono()</code></td><td><code>replaceAll("[^0-9]", "")</code></td><td>"(502) 1234-5678" → "50212345678"</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="col-lg-6">
+
+        <div class="card">
+          <div class="card-body">
+            <h2 class="h5 section-title">Anotaciones clave de Spring Security</h2>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Anotación / Método</th><th>¿Qué hace?</th></tr></thead>
+                <tbody>
+                  <tr><td><code>@Configuration</code></td><td>Marca la clase como configuración de Spring</td></tr>
+                  <tr><td><code>@Bean</code></td><td>Registra un objeto en el contenedor de Spring</td></tr>
+                  <tr><td><code>permitAll()</code></td><td>Cualquiera puede acceder (sin login)</td></tr>
+                  <tr><td><code>authenticated()</code></td><td>Solo usuarios con sesión activa</td></tr>
+                  <tr><td><code>hasRole("ADMIN")</code></td><td>Solo usuarios con rol ADMIN</td></tr>
+                  <tr><td><code>formLogin()</code></td><td>Habilita el formulario de login</td></tr>
+                  <tr><td><code>logout()</code></td><td>Habilita la ruta /logout</td></tr>
+                  <tr><td><code>BCryptPasswordEncoder</code></td><td>Encripta contraseñas (nunca texto plano)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Thymeleaf + Security (sec:authorize)</h2>
+            <pre><code class="language-html">&lt;!-- Solo si está autenticado --&gt;
+&lt;span sec:authorize="isAuthenticated()"&gt;
+  Bienvenido, &lt;span sec:authentication="name"&gt;&lt;/span&gt;
+&lt;/span&gt;
+
+&lt;!-- Solo para ADMIN --&gt;
+&lt;div sec:authorize="hasRole('ADMIN')"&gt;
+  &lt;a href="/admin/panel"&gt;Panel Admin&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;!-- Solo si NO está autenticado --&gt;
+&lt;a sec:authorize="!isAuthenticated()" href="/login"&gt;
+  Iniciar sesión
+&lt;/a&gt;</code></pre>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Errores comunes → Soluciones</h2>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead><tr><th>Síntoma</th><th>Causa</th><th>Solución</th></tr></thead>
+                <tbody>
+                  <tr><td>CSS no carga (pide login)</td><td>Falta <code>permitAll</code> para /css/**</td><td><code>.requestMatchers("/css/**").permitAll()</code></td></tr>
+                  <tr><td>403 Forbidden en POST</td><td>CSRF token faltante</td><td>Usar <code>th:action="@{/ruta}"</code></td></tr>
+                  <tr><td>Login redirige a Whitelabel</td><td>Falta <code>defaultSuccessUrl</code></td><td><code>.defaultSuccessUrl("/recursos", true)</code></td></tr>
+                  <tr><td>Contraseña no funciona</td><td>No se codificó con BCrypt</td><td><code>encoder().encode("1234")</code></td></tr>
+                  <tr><td><code>sec:authorize</code> falla</td><td>Falta dependencia</td><td>Agregar <code>thymeleaf-extras-springsecurity6</code></td></tr>
+                  <tr><td>Campo calculado siempre 0</td><td>Getter no tiene <code>@Transient</code></td><td>Agregar <code>@Transient</code> sobre el getter</td></tr>
+                  <tr><td>Dato se pierde al reiniciar</td><td><code>@Transient</code> en campo que SÍ quieres guardar</td><td>Quitar <code>@Transient</code> del campo persistido</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Checklist de QA manual</h2>
+            <ol>
+              <li>✅ App arranca sin errores en localhost</li>
+              <li>🔐 Login correcto → entra</li>
+              <li>❌ Login incorrecto → muestra error</li>
+              <li>📝 Crear registro → se guarda</li>
+              <li>📋 Listar registros → se ven</li>
+              <li>🧮 Campo calculado → valor correcto</li>
+              <li>🔄 Setter transformador → dato limpio</li>
+              <li>🚪 Logout → redirige al login</li>
+              <li>🛡️ Rol incorrecto → no ve sección protegida</li>
+              <li>📱 Responsive → funciona en celular</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <h2 class="h5 section-title">Ciclo de redeploy seguro</h2>
+            <div class="terminal-sim">
+              <span class="comment"># 1. Cambios en código</span><br>
+              <span class="comment"># 2. QA manual en localhost (checklist)</span><br>
+              <span class="comment"># 3. Commit descriptivo</span><br>
+              <span class="prompt">$</span> git add .<br>
+              <span class="prompt">$</span> git commit -m "Agregar Spring Security + getter calculado"<br>
+              <span class="prompt">$</span> git push origin main<br><br>
+              <span class="success"># Render re-deploya automáticamente (3-8 min)</span><br>
+              <span class="success"># Si el build falla → versión anterior sigue activa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="py-4 border-top bg-white">
+    <div class="container small-muted">Resumen rápido — Sesión 8 · Vuelve a <a href="index.html">inicio</a></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    hljs.highlightAll();
+    tippy('[data-tippy-content]', { theme: 'light', maxWidth: 280 });
+  </script>
+</body>
+</html>

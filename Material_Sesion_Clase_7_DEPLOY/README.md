@@ -27,9 +27,23 @@
 
 ## Requisitos de la app para deploy en Render
 
-### Archivo: `system.properties` (raíz del proyecto)
-```properties
-java.runtime.version=17
+### Archivo: `Dockerfile` (raíz del proyecto)
+
+Render **no tiene Java como runtime nativo**. Se necesita un Dockerfile multi-stage:
+
+```dockerfile
+# Etapa 1: Compilar el proyecto
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
+# Etapa 2: Ejecutar la aplicación
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 10000
+CMD ["java", "-Xmx256m", "-jar", "app.jar"]
 ```
 
 ### Ajustes en `application.properties`
@@ -45,15 +59,15 @@ spring.h2.console.settings.web-allow-others=true
 ### Configuración de Render
 | Campo | Valor |
 |---|---|
-| Build Command | `./mvnw clean install -DskipTests` |
-| Start Command | `java -jar target/*.jar` |
+| Language | **Docker** |
+| Dockerfile Path | `./Dockerfile` |
 | Plan | Free |
-| Variable | `JAVA_TOOL_OPTIONS=-Xmx256m` |
+| Variable (opcional) | `JAVA_TOOL_OPTIONS=-Xmx256m` (ya incluido en el CMD del Dockerfile) |
 
 ## Flujo de deploy
 
 ```
-Código listo → git add . → git commit -m "..." → git push origin main → Render detecta → Build → ¡En vivo!
+Código listo → git add . → git commit -m "..." → git push origin main → Render detecta → Docker Build → ¡En vivo!
 ```
 
 ## Estructura del proyecto para deploy
@@ -61,7 +75,8 @@ Código listo → git add . → git commit -m "..." → git push origin main →
 ```
 mi-proyecto/
 ├── pom.xml
-├── system.properties          ← NUEVO (Java 17)
+├── Dockerfile                    ← NUEVO (multi-stage build)
+├── .dockerignore                 ← NUEVO (excluir target/, .idea/, etc.)
 ├── .gitignore
 ├── mvnw / mvnw.cmd
 ├── src/

@@ -92,17 +92,31 @@
       <div class="col-lg-6">
         <div class="card h-100">
           <div class="card-body">
-            <h2 class="h5 section-title">Ejercicio 2 — Crear system.properties</h2>
-            <p class="small-muted">Este archivo le dice a Render qué versión de Java usar.</p>
+            <h2 class="h5 section-title">Ejercicio 2 — Crear Dockerfile</h2>
+            <p class="small-muted">Render <strong>no tiene Java como runtime nativo</strong> (solo soporta Node.js, Python, Ruby, Go, Rust y Elixir). Necesitas un <code>Dockerfile</code> que le diga cómo compilar y ejecutar tu app.</p>
             <ol>
               <li>En la <strong>raíz del proyecto</strong> (junto a pom.xml), crea un archivo nuevo.</li>
-              <li>Nombre: <code>system.properties</code></li>
-              <li>Contenido (una sola línea):</li>
+              <li>Nombre: <code>Dockerfile</code> (sin extensión)</li>
+              <li>Contenido:</li>
             </ol>
-            <pre><code class="language-properties">java.runtime.version=17</code></pre>
+            <pre><code class="language-dockerfile"># Etapa 1: Compilar el proyecto
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
+# Etapa 2: Ejecutar la aplicación
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 10000
+CMD ["java", "-Xmx256m", "-jar", "app.jar"]</code></pre>
             <details>
-              <summary class="fw-semibold">¿Por qué esto es necesario?</summary>
-              <div class="mt-2 small-muted">Render no sabe qué versión de Java necesitas. Sin este archivo, podría usar Java 8 y tu app (que requiere Java 17) no compilará.</div>
+              <summary class="fw-semibold">¿Qué hace cada línea?</summary>
+              <div class="mt-2 small-muted">
+                <strong>Etapa 1 (build):</strong> Usa una imagen con Maven y Java 17 para compilar tu proyecto. <code>COPY . .</code> copia tu código al contenedor. <code>RUN ./mvnw clean package</code> compila y genera el .jar.<br>
+                <strong>Etapa 2 (run):</strong> Usa una imagen ligera solo con Java 17 JRE. Copia solo el .jar compilado. <code>EXPOSE 10000</code> documenta el puerto. <code>CMD</code> ejecuta la app con límite de 256 MB de memoria.
+              </div>
             </details>
           </div>
         </div>
@@ -140,8 +154,8 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
         <div class="card h-100">
           <div class="card-body">
             <h2 class="h5 section-title">Ejercicio 4 — Verificar .gitignore</h2>
-            <p class="small-muted">Asegúrate de NO subir archivos innecesarios.</p>
-            <pre><code class="language-bash"># Tu .gitignore debe incluir al menos:
+            <p class="small-muted">Asegúrate de NO subir archivos innecesarios. Crea también un <code>.dockerignore</code> con el mismo contenido.</p>
+            <pre><code class="language-bash"># Tu .gitignore (y .dockerignore) debe incluir al menos:
 target/
 *.class
 *.jar
@@ -169,12 +183,12 @@ target/
                 <h6 class="fw-bold">Paso 1: Ver estado</h6>
                 <pre><code class="language-bash">git status</code></pre>
                 <p class="small-muted">Escribe qué archivos aparecen en rojo o verde:</p>
-                <textarea class="form-control" rows="2" placeholder="Ej: system.properties (nuevo), application.properties (modificado)"></textarea>
+                <textarea class="form-control" rows="2" placeholder="Ej: Dockerfile (nuevo), application.properties (modificado)"></textarea>
               </div>
               <div class="col-md-4">
                 <h6 class="fw-bold">Paso 2: Agregar y commitear</h6>
                 <pre><code class="language-bash">git add .
-git commit -m "Preparar proyecto para deploy en Render"</code></pre>
+git commit -m "Preparar proyecto para deploy en Render con Docker"</code></pre>
                 <p class="small-muted">Escribe tu propio mensaje de commit:</p>
                 <input class="form-control" placeholder="Tu mensaje descriptivo..." />
               </div>
@@ -217,16 +231,16 @@ git commit -m "Preparar proyecto para deploy en Render"</code></pre>
               <li><strong>New +</strong> → <strong>Web Service</strong></li>
               <li><strong>Build and deploy from a Git repository</strong></li>
               <li>Conectar tu repositorio</li>
-              <li>Verificar que detecta "Java" como runtime</li>
+              <li>En <strong>Language</strong>, seleccionar <strong>Docker</strong> (no elegir Java — no existe como opción nativa)</li>
               <li>Configurar:
                 <ul>
                   <li>Name: <em>(nombre de tu app)</em></li>
                   <li>Branch: <code>main</code></li>
-                  <li>Build: <code>./mvnw clean install -DskipTests</code></li>
-                  <li>Start: <code>java -jar target/*.jar</code></li>
+                  <li>Dockerfile Path: <code>./Dockerfile</code> (se detecta automáticamente)</li>
                   <li>Plan: <strong>Free</strong></li>
                 </ul>
               </li>
+              <li><strong>Nota:</strong> No hay campos de Build Command ni Start Command — el Dockerfile los reemplaza.</li>
             </ol>
           </div>
         </div>
@@ -236,21 +250,22 @@ git commit -m "Preparar proyecto para deploy en Render"</code></pre>
       <div class="col-lg-6">
         <div class="card h-100">
           <div class="card-body">
-            <h2 class="h5 section-title">Ejercicio 8 — Variable de entorno</h2>
-            <p class="small-muted">La memoria es limitada en el plan gratuito.</p>
+            <h2 class="h5 section-title">Ejercicio 8 — Verificar el build en los logs</h2>
+            <p class="small-muted">El <code>Dockerfile</code> ya incluye <code>-Xmx256m</code> en el CMD, así que la memoria está limitada automáticamente. Ahora obsérvalo en acción.</p>
             <ol>
-              <li>En tu Web Service → pestaña <strong>"Environment"</strong></li>
-              <li>Agregar variable:
+              <li>Después de crear el Web Service, ve a la pestaña <strong>"Logs"</strong>.</li>
+              <li>Observa cómo Render ejecuta <code>docker build</code> usando tu Dockerfile.</li>
+              <li>Busca estas líneas clave:
                 <ul>
-                  <li>Key: <code>JAVA_TOOL_OPTIONS</code></li>
-                  <li>Value: <code>-Xmx256m</code></li>
+                  <li><code>Step X/Y : FROM maven:3.9-eclipse-temurin-17</code> → Descargando imagen base</li>
+                  <li><code>BUILD SUCCESS</code> → Maven compiló correctamente</li>
+                  <li><code>Started Application in X seconds</code> → la app arrancó</li>
                 </ul>
               </li>
-              <li>Click <strong>"Save Changes"</strong></li>
             </ol>
             <details>
-              <summary class="fw-semibold">¿Qué es -Xmx256m?</summary>
-              <div class="mt-2 small-muted">Le dice a Java: "no uses más de 256 megabytes de memoria". Como el plan gratis tiene 512 MB, dejamos espacio para el sistema operativo.</div>
+              <summary class="fw-semibold">¿Y si quiero cambiar la memoria sin tocar el Dockerfile?</summary>
+              <div class="mt-2 small-muted">Puedes agregar una variable de entorno en Render: Key: <code>JAVA_TOOL_OPTIONS</code>, Value: <code>-Xmx256m</code>. Esto sobreescribe el valor del CMD.</div>
             </details>
           </div>
         </div>
@@ -260,8 +275,8 @@ git commit -m "Preparar proyecto para deploy en Render"</code></pre>
       <div class="col-lg-6">
         <div class="card h-100">
           <div class="card-body">
-            <h2 class="h5 section-title">Ejercicio 9 — Leer los logs del build</h2>
-            <p class="small-muted">Mientras Render construye tu app, aparecen logs en tiempo real.</p>
+            <h2 class="h5 section-title">Ejercicio 9 — Leer los logs del build (Docker)</h2>
+            <p class="small-muted">Mientras Render construye tu imagen Docker, aparecen logs en tiempo real.</p>
             <ol>
               <li>Observa la pestaña <strong>"Logs"</strong> en Render.</li>
               <li>Busca estas líneas clave:

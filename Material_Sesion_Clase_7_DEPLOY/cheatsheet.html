@@ -79,9 +79,20 @@
         <div class="card mt-3">
           <div class="card-body">
             <h2 class="h5 section-title">Archivos de configuración</h2>
-            <h6 class="fw-bold mt-3">system.properties</h6>
-            <pre><code class="language-properties">java.runtime.version=17</code></pre>
-            <p class="small-muted">Ubicación: raíz del proyecto (junto a pom.xml).</p>
+            <h6 class="fw-bold mt-3">Dockerfile</h6>
+            <p class="small-muted">Ubicación: raíz del proyecto (junto a pom.xml). Render <strong>no tiene Java nativo</strong> — necesita este archivo para compilar y ejecutar tu app.</p>
+            <pre><code class="language-dockerfile"># Etapa 1: Compilar el proyecto
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
+# Etapa 2: Ejecutar la aplicación
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 10000
+CMD ["java", "-Xmx256m", "-jar", "app.jar"]</code></pre>
 
             <h6 class="fw-bold mt-3">application.properties (producción)</h6>
             <pre><code class="language-properties"># Puerto dinámico de Render
@@ -105,10 +116,10 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
               <table class="table table-sm">
                 <thead><tr><th style="color:#ef4444">❌ Mal</th><th style="color:#10b981">✅ Bien</th></tr></thead>
                 <tbody>
-                  <tr><td><code>cambios</code></td><td><code>Agregar system.properties para Java 17</code></td></tr>
+                  <tr><td><code>cambios</code></td><td><code>Agregar Dockerfile para deploy en Render</code></td></tr>
                   <tr><td><code>fix</code></td><td><code>Corregir puerto dinámico en application.properties</code></td></tr>
                   <tr><td><code>update</code></td><td><code>Cambiar H2 de archivo a memoria para producción</code></td></tr>
-                  <tr><td><code>asdf</code></td><td><code>Agregar variable JAVA_TOOL_OPTIONS para Render</code></td></tr>
+                  <tr><td><code>asdf</code></td><td><code>Agregar Dockerfile multi-stage para Render</code></td></tr>
                 </tbody>
               </table>
             </div>
@@ -125,23 +136,25 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
               <table class="table table-sm align-middle">
                 <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
                 <tbody>
-                  <tr><td><strong>Runtime</strong></td><td>Java (detectado por pom.xml)</td></tr>
+                  <tr><td><strong>Language</strong></td><td><strong>Docker</strong> (seleccionar manualmente)</td></tr>
                   <tr><td><strong>Branch</strong></td><td>main</td></tr>
-                  <tr><td><strong>Build Command</strong></td><td><code>./mvnw clean install -DskipTests</code></td></tr>
-                  <tr><td><strong>Start Command</strong></td><td><code>java -jar target/*.jar</code></td></tr>
+                  <tr><td><strong>Dockerfile Path</strong></td><td><code>./Dockerfile</code> (detectado automáticamente)</td></tr>
                   <tr><td><strong>Plan</strong></td><td>Free</td></tr>
                 </tbody>
               </table>
             </div>
 
-            <h6 class="fw-bold mt-3">Variables de entorno</h6>
+            <h6 class="fw-bold mt-3">Variables de entorno (opcionales)</h6>
             <div class="table-responsive">
               <table class="table table-sm">
                 <thead><tr><th>Key</th><th>Value</th><th>¿Por qué?</th></tr></thead>
                 <tbody>
-                  <tr><td><code>JAVA_TOOL_OPTIONS</code></td><td><code>-Xmx256m</code></td><td>Limitar memoria del plan free</td></tr>
+                  <tr><td><code>JAVA_TOOL_OPTIONS</code></td><td><code>-Xmx256m</code></td><td>Opcional — ya incluido en el CMD del Dockerfile</td></tr>
                 </tbody>
               </table>
+            </div>
+            <div class="callout mt-2">
+              <strong>¿Por qué Docker?</strong> Render solo soporta nativamente Node.js, Python, Ruby, Go, Rust y Elixir. Para Java/Spring Boot necesitas un Dockerfile.
             </div>
           </div>
         </div>
@@ -155,8 +168,8 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                 <tbody>
                   <tr>
                     <td><code>UnsupportedClassVersionError</code></td>
-                    <td>Java incorrecto</td>
-                    <td>Crear <code>system.properties</code></td>
+                    <td>Java incorrecto en Dockerfile</td>
+                    <td>Usar <code>eclipse-temurin:17</code> en ambas etapas del Dockerfile</td>
                   </tr>
                   <tr>
                     <td><code>Port 8080 in use</code></td>
@@ -166,12 +179,12 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                   <tr>
                     <td><code>Memory exceeded (OOM)</code></td>
                     <td>Mucha RAM</td>
-                    <td><code>JAVA_TOOL_OPTIONS=-Xmx256m</code></td>
+                    <td><code>-Xmx256m</code> en CMD del Dockerfile o <code>JAVA_TOOL_OPTIONS</code></td>
                   </tr>
                   <tr>
                     <td><code>mvnw: Permission denied</code></td>
                     <td>Sin permisos</td>
-                    <td><code>git update-index --chmod=+x mvnw</code></td>
+                    <td>Agregar <code>RUN chmod +x mvnw</code> en el Dockerfile, o <code>git update-index --chmod=+x mvnw</code></td>
                   </tr>
                   <tr>
                     <td><code>H2 lock error</code></td>
@@ -199,10 +212,10 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
             <h2 class="h5 section-title">Flujo completo en 6 pasos</h2>
             <ol>
               <li>✅ App funciona en <code>localhost:8080</code></li>
-              <li>📄 Crear <code>system.properties</code> → <code>java.runtime.version=17</code></li>
+              <li>� Crear <code>Dockerfile</code> multi-stage (compilar + ejecutar con Java 17)</li>
               <li>⚙️ Ajustar <code>application.properties</code> → puerto dinámico + H2 en memoria</li>
               <li>📤 <code>git add . → git commit → git push</code></li>
-              <li>🌐 Crear Web Service en Render → configurar build/start/variables</li>
+              <li>🌐 Crear Web Service en Render → Language: Docker → seleccionar repo</li>
               <li>🎉 URL pública activa → verificar en celular</li>
             </ol>
           </div>

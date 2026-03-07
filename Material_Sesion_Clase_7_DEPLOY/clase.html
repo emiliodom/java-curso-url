@@ -49,8 +49,8 @@
         <span class="hotspot-label">Comprensión de Git (add, commit, push)</span>
       </div>
       <div class="hotspot-row">
-        <span class="hotspot" data-tippy-content="El estudiante debe saber qué archivos necesita Render."></span>
-        <span class="hotspot-label">Archivos de configuración para deploy</span>
+        <span class="hotspot" data-tippy-content="El estudiante debe saber qué archivos necesita Render (Dockerfile)."></span>
+        <span class="hotspot-label">Archivos de configuración para deploy (Dockerfile)</span>
       </div>
       <div class="hotspot-row">
         <span class="hotspot" data-tippy-content="Capacidad de leer logs de build y diagnosticar errores."></span>
@@ -65,8 +65,8 @@
           <div class="card-body">
             <h2 class="h5 section-title">Objetivos (hoy)</h2>
             <ul class="mb-0">
-              <li>Preparar el proyecto Spring Boot para producción.</li>
-              <li>Ejecutar el flujo completo de Git: add → commit → push.</li>
+              <li>Preparar el proyecto Spring Boot para producción con Docker.</li>
+              <li>Crear un <code>Dockerfile</code> multi-stage para compilar y ejecutar la app.</li>
               <li>Configurar un Web Service en Render paso a paso.</li>
               <li>Verificar que la app funcione con una URL pública.</li>
               <li>Diagnosticar errores comunes de deploy.</li>
@@ -92,8 +92,8 @@
             <div class="small-muted">Continuar con el proyecto de la entidad sin fines de lucro.</div>
             <ul class="mb-0 mt-2">
               <li>Verificar que el CRUD funciona en localhost.</li>
-              <li>Crear system.properties.</li>
-              <li>Ajustar application.properties.</li>
+              <li>Crear <code>Dockerfile</code> multi-stage.</li>
+              <li>Ajustar <code>application.properties</code>.</li>
               <li>Deploy a Render → URL pública.</li>
             </ul>
           </div>
@@ -143,15 +143,27 @@
               <div class="accordion-item">
                 <h2 class="accordion-header" id="h2">
                   <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
-                    2) Preparar el proyecto (20 min) — system.properties + application.properties
+                    2) Preparar el proyecto (25 min) — Dockerfile + application.properties
                   </button>
                 </h2>
                 <div id="c2" class="accordion-collapse collapse" data-bs-parent="#acc">
                   <div class="accordion-body">
                     <ol>
                       <li>Verificar que la app corre en <code>localhost:8080</code> sin errores.</li>
-                      <li>Crear <code>system.properties</code> en la raíz:
-                        <pre><code class="language-properties">java.runtime.version=17</code></pre>
+                      <li>Explicar: “Render <strong>no tiene Java instalado</strong>. Solo soporta Node.js, Python, Ruby, Go, Rust y Elixir de forma nativa. Para Java necesitamos un <code>Dockerfile</code> que le diga a Render cómo compilar y ejecutar nuestra app.”</li>
+                      <li>Crear <code>Dockerfile</code> en la raíz del proyecto:
+                        <pre><code class="language-dockerfile"># Etapa 1: Compilar el proyecto
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
+# Etapa 2: Ejecutar la aplicación
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 10000
+CMD ["java", "-Xmx256m", "-jar", "app.jar"]</code></pre>
                       </li>
                       <li>Ajustar <code>application.properties</code>:
                         <pre><code class="language-properties">server.port=${PORT:8080}
@@ -164,7 +176,10 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                     </ol>
                     <div class="callout warning">
                       <div class="fw-semibold">Punto clave para explicar</div>
-                      <div class="small-muted mt-2"><code>${PORT:8080}</code> es como decir: "usa el puerto que Render te dé; si no hay, usa 8080". Es la misma idea que un respaldo.</div>
+                      <div class="small-muted mt-2">
+                        <strong>¿Qué es un Dockerfile?</strong> Es como una receta de cocina. Tiene dos etapas: la primera compila el proyecto (como preparar ingredientes), la segunda solo incluye lo necesario para ejecutar (como servir el plato). Esto se llama <strong>multi-stage build</strong>.<br><br>
+                        <code>${PORT:8080}</code> es como decir: “usa el puerto que Render te dé; si no hay, usa 8080”. Render asigna un puerto dinámico (por defecto 10000).
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -220,12 +235,12 @@ spring.h2.console.settings.web-allow-others=true</code></pre>
                         <ul>
                           <li>Name: nombre-de-tu-app</li>
                           <li>Branch: main</li>
-                          <li>Build: <code>./mvnw clean install -DskipTests</code></li>
-                          <li>Start: <code>java -jar target/*.jar</code></li>
+                          <li>Language: <strong>Docker</strong> (importante: no elegir Java)</li>
+                          <li>Dockerfile Path: <code>./Dockerfile</code> (se detecta automáticamente)</li>
                           <li>Plan: <strong>Free</strong></li>
                         </ul>
                       </li>
-                      <li>Ir a Environment → agregar <code>JAVA_TOOL_OPTIONS=-Xmx256m</code></li>
+                      <li><strong>Nota:</strong> No hay que configurar Build Command ni Start Command — el Dockerfile ya contiene esas instrucciones.</li>
                       <li>Click <strong>"Create Web Service"</strong></li>
                       <li>Esperar el build (3-8 min). Leer los logs juntos.</li>
                     </ol>

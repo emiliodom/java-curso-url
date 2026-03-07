@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Semana 8 — Seguridad, QA y Mantenimiento (Guía Interactiva)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">Sesión 8 — Seguridad, QA y Mantenimiento</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="clase.html">Guía Docente</a></li>
+          <li class="nav-item"><a class="nav-link" href="ejercicios.html">Ejercicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="cheatsheet.html">Resumen rápido</a></li>
+          <li class="nav-item"><a class="nav-link" href="entregable_equipo.html">Entregable</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container py-5">
+      <p class="eyebrow">Semana 8 · Seguridad, QA y Mantenimiento</p>
+      <h1>Proteger, verificar y mantener tu app</h1>
+      <p class="lead">Guía interactiva para aplicar seguridad básica, buenas prácticas de QA, campos calculados con getters/setters, y redeploy seguro en producción.</p>
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-primary" href="#seguridad">Seguridad básica</a>
+        <a class="btn btn-outline-light" href="#getters-setters">Getters/Setters calculados</a>
+        <a class="btn btn-outline-light" href="#qa">QA y Testing</a>
+        <a class="btn btn-outline-light" href="#redeploy">Redeploy seguro</a>
+        <a class="btn btn-outline-light" href="#diagramas">Diagramas</a>
+        <a class="btn btn-outline-light" href="#quiz">Quiz</a>
+        <a class="btn btn-outline-light" href="#checklist">Checklist</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== SECCIÓN 1: SEGURIDAD BÁSICA ===================== -->
+    <section class="section" id="seguridad">
+      <div class="container">
+        <div class="section-title">
+          <h2>🔒 Seguridad básica en Spring Boot</h2>
+          <p>La seguridad no es opcional. Es como ponerle candado a la puerta de tu casa: sin ella, cualquiera puede entrar y hacer lo que quiera con tu información.</p>
+        </div>
+
+        <div class="callout mb-4">
+          <strong>Analogía clave:</strong> Tu app sin seguridad es como dejar la puerta abierta con un cartel que dice "pase, agarre lo que quiera". Agregar seguridad es poner cerradura, llave y portero.
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-4 col-lg-2">
+            <div class="security-step text-center">
+              <span class="step-num">1</span>
+              <h3 class="h6 mt-4">Dependencia</h3>
+              <p class="small-muted">Agregar Spring Security al pom.xml</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="security-step text-center">
+              <span class="step-num">2</span>
+              <h3 class="h6 mt-4">Configurar</h3>
+              <p class="small-muted">Definir usuarios y roles</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="security-step text-center">
+              <span class="step-num">3</span>
+              <h3 class="h6 mt-4">Proteger</h3>
+              <p class="small-muted">Restringir rutas por rol</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="security-step text-center">
+              <span class="step-num">4</span>
+              <h3 class="h6 mt-4">Login</h3>
+              <p class="small-muted">Formulario de inicio de sesión</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="security-step text-center">
+              <span class="step-num">5</span>
+              <h3 class="h6 mt-4">Probar</h3>
+              <p class="small-muted">Verificar acceso/denegación</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-lg-2">
+            <div class="security-step text-center">
+              <span class="step-num">6</span>
+              <h3 class="h6 mt-4">Redeploy</h3>
+              <p class="small-muted">Push → Render actualiza</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-4">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Paso 1: Agregar la dependencia</h3>
+              <p>En tu <code>pom.xml</code>, dentro de <code>&lt;dependencies&gt;</code>:</p>
+              <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+              <div class="callout warning">
+                <strong>⚠️ Al agregar esta dependencia, TODO se bloquea.</strong> Spring Security protege todas las rutas automáticamente. Verás un formulario de login que no existía antes. Usuario: <code>user</code>, contraseña: en la consola de arranque.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Paso 2: Configuración básica de seguridad</h3>
+              <p>Crea la clase <code>SecurityConfig.java</code>:</p>
+              <pre><code class="language-java">package com.ejemplo.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web
+    .builders.HttpSecurity;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.security.crypto.bcrypt.*;
+import org.springframework.security.crypto.password.*;
+import org.springframework.security.provisioning.*;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filtro(HttpSecurity http)
+            throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/css/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/recursos", true)
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
+            );
+        return http.build();
+    }
+
+    @Bean
+    public UserDetailsService usuarios() {
+        UserDetails usuario = User.builder()
+            .username("docente")
+            .password(encoder().encode("1234"))
+            .roles("USER")
+            .build();
+        UserDetails admin = User.builder()
+            .username("admin")
+            .password(encoder().encode("admin123"))
+            .roles("ADMIN", "USER")
+            .build();
+        return new InMemoryUserDetailsManager(usuario, admin);
+    }
+
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Paso 3: Crear la vista de login</h3>
+              <p>Archivo: <code>templates/login.html</code></p>
+              <pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html xmlns:th="http://www.thymeleaf.org"&gt;
+&lt;head&gt;
+  &lt;title&gt;Iniciar Sesión&lt;/title&gt;
+  &lt;link rel="stylesheet" href="/css/styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="container mt-5"&gt;
+    &lt;h2&gt;Iniciar Sesión&lt;/h2&gt;
+    &lt;div th:if="${param.error}"
+         class="alert alert-danger"&gt;
+      Usuario o contraseña incorrectos.
+    &lt;/div&gt;
+    &lt;div th:if="${param.logout}"
+         class="alert alert-success"&gt;
+      Sesión cerrada.
+    &lt;/div&gt;
+    &lt;form th:action="@{/login}" method="post"&gt;
+      &lt;div class="mb-3"&gt;
+        &lt;label&gt;Usuario&lt;/label&gt;
+        &lt;input type="text" name="username"
+               class="form-control" required&gt;
+      &lt;/div&gt;
+      &lt;div class="mb-3"&gt;
+        &lt;label&gt;Contraseña&lt;/label&gt;
+        &lt;input type="password" name="password"
+               class="form-control" required&gt;
+      &lt;/div&gt;
+      &lt;button class="btn btn-primary"&gt;Entrar&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Paso 4: Controlador de login + botón logout</h3>
+              <p>Agregar al controlador:</p>
+              <pre><code class="language-java">@GetMapping("/login")
+public String login() {
+    return "login";
+}</code></pre>
+              <p class="mt-3">En cualquier vista protegida, agregar botón de logout:</p>
+              <pre><code class="language-html">&lt;form th:action="@{/logout}" method="post"&gt;
+  &lt;button class="btn btn-outline-danger"&gt;
+    Cerrar sesión
+  &lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+              <div class="callout success mt-3">
+                <strong>Resumen de roles:</strong>
+                <ul class="mb-0 mt-1">
+                  <li><code>docente / 1234</code> → puede ver y crear recursos</li>
+                  <li><code>admin / admin123</code> → puede todo + sección admin</li>
+                  <li>Sin login → solo ve la página principal</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-12">
+            <div class="info-card">
+              <h3>Mostrar/ocultar contenido según rol (Thymeleaf + Security)</h3>
+              <p>Agregar al <code>pom.xml</code>:</p>
+              <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;
+    &lt;artifactId&gt;thymeleaf-extras-springsecurity6&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+              <p class="mt-3">En tus vistas HTML:</p>
+              <pre><code class="language-html">&lt;!-- Solo visible para ADMIN --&gt;
+&lt;div sec:authorize="hasRole('ADMIN')"&gt;
+  &lt;a href="/admin/panel"&gt;Panel de administración&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;!-- Solo visible si está autenticado --&gt;
+&lt;span sec:authorize="isAuthenticated()"&gt;
+  Bienvenido, &lt;span sec:authentication="name"&gt;&lt;/span&gt;
+&lt;/span&gt;
+
+&lt;!-- Solo visible si NO está autenticado --&gt;
+&lt;a sec:authorize="!isAuthenticated()" href="/login"&gt;
+  Iniciar sesión
+&lt;/a&gt;</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 2: GETTERS/SETTERS CALCULADOS ===================== -->
+    <section class="section section-alt" id="getters-setters">
+      <div class="container">
+        <div class="section-title">
+          <h2>🧮 Getters y Setters con campos calculados</h2>
+          <p>Un getter no solo devuelve un valor — puede calcular algo nuevo. Un setter no solo guarda — puede transformar antes de guardar. Esto es muy útil para campos derivados como totales, edades o estados.</p>
+        </div>
+
+        <div class="callout mb-4">
+          <strong>Analogía:</strong> Un getter es como un cajero automático: no solo te da el dinero, puede calcular tu saldo actual. Un setter es como un filtro de agua: antes de guardar el agua, la limpia.
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Ejemplo 1: Campo calculado con getter (no se guarda en BD)</h3>
+              <p>Imaginemos una entidad <code>Recurso</code> con precio y cantidad. El total se <strong>calcula</strong>, no se almacena:</p>
+              <pre><code class="language-java">@Entity
+public class Recurso {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nombre;
+    private double precioUnitario;
+    private int cantidad;
+
+    // Getter calculado: NO tiene columna en la BD
+    @Transient  // ← le dice a JPA: no guardes esto
+    public double getTotal() {
+        return precioUnitario * cantidad;
+    }
+
+    // Getters y setters normales...
+    public double getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setPrecioUnitario(double precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    // ... más getters/setters
+}</code></pre>
+              <div class="callout">
+                <strong>¿Por qué <code>@Transient</code>?</strong> Le dice a JPA: "este campo no existe en la base de datos, no lo guardes ni lo busques". Es un valor que se calcula al vuelo cada vez que lo pides.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Ejemplo 2: Setter que transforma antes de guardar</h3>
+              <p>Un setter puede limpiar, formatear o validar el dato antes de almacenarlo:</p>
+              <pre><code class="language-java">@Entity
+public class Beneficiario {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nombre;
+    private String email;
+    private String telefono;
+
+    // Setter que transforma: nombre siempre en mayúsculas
+    public void setNombre(String nombre) {
+        this.nombre = (nombre != null)
+            ? nombre.trim().toUpperCase()
+            : null;
+    }
+
+    // Setter que limpia: teléfono solo dígitos
+    public void setTelefono(String telefono) {
+        if (telefono != null) {
+            this.telefono = telefono
+                .replaceAll("[^0-9]", "");
+        } else {
+            this.telefono = null;
+        }
+    }
+
+    // Setter que valida: email siempre en minúsculas
+    public void setEmail(String email) {
+        this.email = (email != null)
+            ? email.trim().toLowerCase()
+            : null;
+    }
+
+    // Getters normales...
+    public String getNombre() { return nombre; }
+    public String getTelefono() { return telefono; }
+    public String getEmail() { return email; }
+}</code></pre>
+              <div class="callout warning">
+                <strong>Importante:</strong> El setter se ejecuta automáticamente cuando Spring recibe datos del formulario (<code>@ModelAttribute</code>). No necesitas llamarlo manualmente — el framework lo hace por ti.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Ejemplo 3: Getter calculado — Edad a partir de fecha</h3>
+              <pre><code class="language-java">import java.time.LocalDate;
+import java.time.Period;
+
+@Entity
+public class Beneficiario {
+    // ... otros campos
+
+    private LocalDate fechaNacimiento;
+
+    // Getter calculado: edad en años
+    @Transient
+    public int getEdad() {
+        if (fechaNacimiento == null) return 0;
+        return Period.between(
+            fechaNacimiento, LocalDate.now()
+        ).getYears();
+    }
+
+    // En la vista Thymeleaf:
+    // &lt;td th:text="${beneficiario.edad}"&gt;&lt;/td&gt;
+}</code></pre>
+              <div class="callout success">
+                <strong>En la vista:</strong> Thymeleaf accede a <code>getEdad()</code> automáticamente con <code>${beneficiario.edad}</code>. No necesitas campo <code>edad</code> en la BD — siempre está actualizado.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Ejemplo 4: Getter que devuelve un estado textual</h3>
+              <pre><code class="language-java">@Entity
+public class Recurso {
+    // ... otros campos
+
+    private int cantidad;
+    private boolean activo;
+
+    // Getter calculado: estado legible
+    @Transient
+    public String getEstado() {
+        if (!activo) return "Inactivo";
+        if (cantidad == 0) return "Agotado";
+        if (cantidad < 5) return "Bajo stock";
+        return "Disponible";
+    }
+
+    // En la vista Thymeleaf:
+    // &lt;td th:text="${recurso.estado}"&gt;&lt;/td&gt;
+    //
+    // Incluso con condicional de color:
+    // &lt;span th:text="${recurso.estado}"
+    //   th:classappend="${recurso.estado == 'Agotado'}
+    //     ? 'text-danger' : 'text-success'"&gt;
+    // &lt;/span&gt;
+}</code></pre>
+              <div class="callout">
+                <strong>Pattern útil:</strong> En vez de guardar "Agotado" en la BD (que se desactualiza), lo calculas en tiempo real basándote en datos que sí están guardados (<code>cantidad</code>, <code>activo</code>).
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="info-card">
+              <h3>Resumen: ¿Cuándo usar cada técnica?</h3>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                  <thead><tr><th>Técnica</th><th>¿Qué hace?</th><th>Ejemplo</th><th>¿Se guarda en BD?</th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>Getter calculado</strong> con <code>@Transient</code></td><td>Devuelve un valor derivado de otros campos</td><td><code>getTotal()</code>, <code>getEdad()</code>, <code>getEstado()</code></td><td>No</td></tr>
+                    <tr><td><strong>Setter con transformación</strong></td><td>Limpia/formatea el dato antes de guardarlo</td><td><code>setNombre()</code> → mayúsculas, <code>setTelefono()</code> → solo dígitos</td><td>Sí (transformado)</td></tr>
+                    <tr><td><strong>Setter con validación</strong></td><td>Verifica y corrige el dato</td><td><code>setEmail()</code> → minúsculas + trim</td><td>Sí (validado)</td></tr>
+                    <tr><td><strong>Campo normal</strong></td><td>Guarda y devuelve tal cual</td><td><code>getNombre()</code>, <code>setNombre()</code></td><td>Sí</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 3: QA Y TESTING ===================== -->
+    <section class="section" id="qa">
+      <div class="container">
+        <div class="section-title">
+          <h2>🧪 QA: Calidad y Testing básico</h2>
+          <p>QA (Quality Assurance) significa verificar que tu app funciona correctamente antes de que el usuario final la use. Es como revisar un examen antes de entregarlo.</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Checklist de QA manual</h3>
+              <p>Antes de cada deploy, verifica:</p>
+              <ol>
+                <li>✅ La app arranca sin errores en localhost</li>
+                <li>✅ El login funciona (usuario correcto e incorrecto)</li>
+                <li>✅ Puedes crear un registro nuevo</li>
+                <li>✅ Puedes ver la lista de registros</li>
+                <li>✅ El campo calculado muestra valores correctos</li>
+                <li>✅ Un usuario sin rol ADMIN no ve la sección admin</li>
+                <li>✅ El logout funciona y redirige al login</li>
+                <li>✅ La app funciona en el celular (responsive)</li>
+              </ol>
+              <div class="callout">
+                <strong>Regla de oro:</strong> Si no lo probaste, no funciona. Nunca asumas que un cambio "pequeño" no rompe nada.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Flujo de QA antes de deploy</h3>
+              <div class="terminal-sim">
+                <span class="comment"># 1. Compilar sin errores</span><br>
+                <span class="prompt">$</span> ./mvnw clean package<br><br>
+                <span class="comment"># 2. Ejecutar en localhost</span><br>
+                <span class="prompt">$</span> ./mvnw spring-boot:run<br><br>
+                <span class="comment"># 3. Probar manualmente:</span><br>
+                <span class="output">  → Login correcto</span><br>
+                <span class="output">  → Login incorrecto (muestra error)</span><br>
+                <span class="output">  → Crear registro</span><br>
+                <span class="output">  → Ver lista</span><br>
+                <span class="output">  → Verificar campos calculados</span><br>
+                <span class="output">  → Probar con rol diferente</span><br>
+                <span class="output">  → Logout</span><br><br>
+                <span class="comment"># 4. Si todo funciona → commit + push</span><br>
+                <span class="prompt">$</span> git add .<br>
+                <span class="prompt">$</span> git commit -m "Agregar seguridad y campos calculados"<br>
+                <span class="prompt">$</span> git push origin main<br>
+                <span class="success"># → Render re-deploya automáticamente</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Errores comunes de seguridad</h3>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead><tr><th>Síntoma</th><th>Causa</th><th>Solución</th></tr></thead>
+                  <tbody>
+                    <tr><td>Todo pide login (incluso CSS)</td><td>No hay <code>permitAll()</code> para recursos estáticos</td><td>Agregar <code>.requestMatchers("/css/**").permitAll()</code></td></tr>
+                    <tr><td>403 Forbidden al hacer POST</td><td>CSRF protección</td><td>Usar <code>th:action="@{/ruta}"</code> en formularios Thymeleaf (agrega token automáticamente)</td></tr>
+                    <tr><td>Login redirige a Whitelabel</td><td>Falta <code>defaultSuccessUrl</code></td><td>Agregar <code>.defaultSuccessUrl("/recursos", true)</code></td></tr>
+                    <tr><td>Contraseña no funciona</td><td>No se codificó con BCrypt</td><td>Usar <code>encoder().encode("1234")</code></td></tr>
+                    <tr><td><code>sec:authorize</code> no funciona</td><td>Falta dependencia thymeleaf-security</td><td>Agregar <code>thymeleaf-extras-springsecurity6</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Buenas prácticas de mantenimiento</h3>
+              <ul>
+                <li><strong>Commits pequeños y descriptivos:</strong> un commit por funcionalidad.</li>
+                <li><strong>No subir contraseñas reales:</strong> los usuarios en memoria son solo para demo. En producción real se usa BD.</li>
+                <li><strong>Probar antes de pushear:</strong> siempre verificar en localhost primero.</li>
+                <li><strong>Leer los logs:</strong> Render muestra todo en la pestaña Logs.</li>
+                <li><strong>Un cambio a la vez:</strong> si algo se rompe, sabes exactamente qué fue.</li>
+              </ul>
+              <div class="callout warning">
+                <strong>Regla del redeploy seguro:</strong> Nunca hagas 5 cambios y un solo push. Haz 5 commits separados. Si algo falla, puedes hacer rollback al último commit bueno.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 4: REDEPLOY ===================== -->
+    <section class="section section-alt" id="redeploy">
+      <div class="container">
+        <div class="section-title">
+          <h2>🔄 Redeploy: cambios en producción</h2>
+          <p>Ya sabes deployar. Ahora aprenderás a hacer cambios en una app que ya está en internet — sin romperla.</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Ciclo de redeploy seguro</h3>
+              <ol>
+                <li><strong>Cambiar</strong> código en tu editor local.</li>
+                <li><strong>Probar</strong> en localhost (QA manual).</li>
+                <li><strong>Commit</strong> con mensaje descriptivo.</li>
+                <li><strong>Push</strong> a GitHub.</li>
+                <li><strong>Render</strong> detecta y re-deploya automáticamente.</li>
+                <li><strong>Verificar</strong> en la URL pública.</li>
+              </ol>
+              <div class="callout success">
+                <strong>La clave:</strong> Cada push es un deploy. Si el build falla, Render mantiene la versión anterior activa (zero-downtime deploy). Tu app nunca "se cae" por un build fallido.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="info-card">
+              <h3>Rollback en Render</h3>
+              <p>Si un deploy nuevo rompe algo:</p>
+              <ol>
+                <li>Ir a tu servicio en Render → pestaña <strong>Events</strong>.</li>
+                <li>Encontrar el deploy anterior que funcionaba.</li>
+                <li>Click <strong>"Rollback to this deploy"</strong>.</li>
+                <li>Render restaura la versión anterior en segundos.</li>
+              </ol>
+              <div class="callout warning">
+                <strong>Nota:</strong> En el plan Free, solo puedes hacer rollback a los 2 deploys anteriores. Por eso es importante hacer commits pequeños y frecuentes.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-12">
+            <div class="info-card">
+              <h3>Ejemplo: Agregar seguridad a un proyecto ya deployado</h3>
+              <div class="terminal-sim">
+                <span class="comment"># 1. Ya tienes tu app en Render sin seguridad</span><br>
+                <span class="comment"># 2. Agregas Spring Security (pom.xml + SecurityConfig)</span><br>
+                <span class="comment"># 3. Pruebas en localhost</span><br>
+                <span class="prompt">$</span> ./mvnw spring-boot:run<br>
+                <span class="output">  → Verificas login, roles, logout</span><br><br>
+                <span class="comment"># 4. Commit descriptivo</span><br>
+                <span class="prompt">$</span> git add .<br>
+                <span class="prompt">$</span> git commit -m "Agregar autenticación con Spring Security (2 roles)"<br><br>
+                <span class="comment"># 5. Push → redeploy automático</span><br>
+                <span class="prompt">$</span> git push origin main<br>
+                <span class="success">  → Render detecta, Docker build, 3-8 min</span><br><br>
+                <span class="comment"># 6. Verificar en la URL pública</span><br>
+                <span class="prompt">$</span> curl -I https://mi-app.onrender.com/login<br>
+                <span class="success">HTTP/1.1 200 OK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 5: DIAGRAMAS ===================== -->
+    <section class="section" id="diagramas">
+      <div class="container">
+        <div class="section-title">
+          <h2>Diagramas</h2>
+          <p>Visualiza el flujo de seguridad y el ciclo de mantenimiento.</p>
+        </div>
+
+        <div class="diagram-grid">
+          <div class="diagram-card">
+            <h3>Flujo de autenticación</h3>
+            <div class="mermaid">
+flowchart TD
+  A[Usuario abre URL] --> B{¿Ruta protegida?}
+  B -->|No| C[Muestra página]
+  B -->|Sí| D{¿Autenticado?}
+  D -->|Sí| E{¿Tiene rol?}
+  D -->|No| F[→ /login]
+  E -->|Sí| C
+  E -->|No| G[403 Forbidden]
+  F --> H[Usuario ingresa credenciales]
+  H --> I{¿Válidas?}
+  I -->|Sí| C
+  I -->|No| J[Error en login]
+            </div>
+          </div>
+
+          <div class="diagram-card">
+            <h3>Getter calculado vs Campo normal</h3>
+            <div class="mermaid">
+flowchart LR
+  subgraph Normal
+    BD1[(BD)] -->|lee| GET1[getter]
+    SET1[setter] -->|escribe| BD1
+  end
+  subgraph Calculado
+    BD2[(BD)] -->|lee campos base| GET2["getter @Transient"]
+    GET2 -->|calcula| R[valor derivado]
+  end
+            </div>
+          </div>
+
+          <div class="diagram-card">
+            <h3>Ciclo de redeploy seguro</h3>
+            <div class="mermaid">
+flowchart TD
+  A[Cambiar código] --> B[Probar en localhost]
+  B --> C{¿Funciona?}
+  C -->|No| A
+  C -->|Sí| D[git commit]
+  D --> E[git push]
+  E --> F[Render re-deploya]
+  F --> G{¿Build OK?}
+  G -->|Sí| H[Verificar URL pública ✅]
+  G -->|No| I[Rollback + revisar logs ❌]
+  I --> A
+            </div>
+          </div>
+
+          <div class="diagram-card">
+            <h3>Setter con transformación</h3>
+            <div class="mermaid">
+flowchart LR
+  FORM[Formulario HTML] -->|"nombre: ' juan '"| SET["setter: trim() + toUpperCase()"]
+  SET -->|"JUAN"| BD[(Base de Datos)]
+  BD -->|"JUAN"| GET[getter]
+  GET -->|"JUAN"| VIEW[Vista Thymeleaf]
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 6: QUIZ ===================== -->
+    <section class="section section-alt" id="quiz">
+      <div class="container">
+        <div class="section-title">
+          <h2>Quiz — ¿Entiendes la seguridad y el QA?</h2>
+          <p>5 preguntas para verificar tu comprensión.</p>
+        </div>
+
+        <div class="quiz-card" id="quizContainer">
+          <div class="quiz-q mb-4">
+            <h5>1. ¿Qué pasa al agregar <code>spring-boot-starter-security</code> sin configurar nada?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q1" value="a"> Nada cambia</label>
+              <label><input type="radio" name="q1" value="b"> Todas las rutas quedan protegidas con un login automático</label>
+              <label><input type="radio" name="q1" value="c"> Solo las rutas /admin se protegen</label>
+              <label><input type="radio" name="q1" value="d"> La app no compila</label>
+            </div>
+            <div class="quiz-feedback" id="fb1" style="display:none"></div>
+          </div>
+
+          <div class="quiz-q mb-4">
+            <h5>2. ¿Para qué sirve <code>@Transient</code> en un getter?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q2" value="a"> Guarda el campo en la base de datos</label>
+              <label><input type="radio" name="q2" value="b"> Indica que el campo NO se persiste — se calcula al vuelo</label>
+              <label><input type="radio" name="q2" value="c"> Hace el campo privado</label>
+              <label><input type="radio" name="q2" value="d"> Encripta el valor</label>
+            </div>
+            <div class="quiz-feedback" id="fb2" style="display:none"></div>
+          </div>
+
+          <div class="quiz-q mb-4">
+            <h5>3. ¿Qué hace <code>.defaultSuccessUrl("/recursos", true)</code>?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q3" value="a"> Redirige a /recursos si el login es exitoso</label>
+              <label><input type="radio" name="q3" value="b"> Muestra un error si /recursos no existe</label>
+              <label><input type="radio" name="q3" value="c"> Desactiva la seguridad para /recursos</label>
+              <label><input type="radio" name="q3" value="d"> Crea la ruta /recursos automáticamente</label>
+            </div>
+            <div class="quiz-feedback" id="fb3" style="display:none"></div>
+          </div>
+
+          <div class="quiz-q mb-4">
+            <h5>4. ¿Cuál es la diferencia entre un setter normal y uno con transformación?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q4" value="a"> No hay diferencia</label>
+              <label><input type="radio" name="q4" value="b"> El setter con transformación modifica el valor antes de guardarlo (ej: trim, uppercase)</label>
+              <label><input type="radio" name="q4" value="c"> El setter con transformación no guarda nada</label>
+              <label><input type="radio" name="q4" value="d"> Solo se puede usar con números</label>
+            </div>
+            <div class="quiz-feedback" id="fb4" style="display:none"></div>
+          </div>
+
+          <div class="quiz-q mb-4">
+            <h5>5. ¿Qué pasa en Render si un build falla después de hacer push?</h5>
+            <div class="quiz-options">
+              <label><input type="radio" name="q5" value="a"> La app se cae</label>
+              <label><input type="radio" name="q5" value="b"> Render mantiene la versión anterior activa (zero-downtime)</label>
+              <label><input type="radio" name="q5" value="c"> Se borra todo</label>
+              <label><input type="radio" name="q5" value="d"> Hay que crear el servicio de nuevo</label>
+            </div>
+            <div class="quiz-feedback" id="fb5" style="display:none"></div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" onclick="checkQuiz()">Verificar respuestas</button>
+          <div id="quizResult" class="callout mt-3" style="display:none"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECCIÓN 7: CHECKLIST ===================== -->
+    <section class="section" id="checklist">
+      <div class="container">
+        <div class="section-title">
+          <h2>Checklist de Semana 8</h2>
+          <p>Marca cada paso conforme lo completes.</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-8">
+            <div class="info-card">
+              <div id="checklistItems">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck1">
+                  <label class="form-check-label" for="ck1"><strong>spring-boot-starter-security</strong> agregado al pom.xml</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck2">
+                  <label class="form-check-label" for="ck2"><strong>SecurityConfig.java</strong> creado con roles USER y ADMIN</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck3">
+                  <label class="form-check-label" for="ck3"><strong>login.html</strong> creado con formulario funcional</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck4">
+                  <label class="form-check-label" for="ck4"><strong>Logout</strong> funciona y redirige al login</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck5">
+                  <label class="form-check-label" for="ck5"><strong>Rutas protegidas</strong> por rol (USER/ADMIN)</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck6">
+                  <label class="form-check-label" for="ck6"><strong>@Transient getter</strong> con campo calculado implementado</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck7">
+                  <label class="form-check-label" for="ck7"><strong>Setter con transformación</strong> implementado (ej: trim, uppercase)</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck8">
+                  <label class="form-check-label" for="ck8"><strong>QA manual</strong> completado en localhost (checklist de 8 puntos)</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck9">
+                  <label class="form-check-label" for="ck9"><strong>Commit descriptivo</strong> + push exitoso</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="ck10">
+                  <label class="form-check-label" for="ck10"><strong>Redeploy verificado</strong> — login funciona en URL pública</label>
+                </div>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between align-items-center">
+                <span id="checklistProgress" class="fw-bold">0 / 10 completos</span>
+                <span id="checklistEmoji" style="font-size:2rem">🔒</span>
+              </div>
+              <div class="progress mt-2" style="height:10px">
+                <div id="checklistBar" class="progress-bar" style="width:0%;background:var(--accent)"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="info-card">
+              <h3>Resumen de archivos nuevos</h3>
+              <div class="file-tree">
+                <span class="folder">📂 mi-proyecto/</span><br>
+                ├── <span class="file">pom.xml</span> (+ 2 dependencias)<br>
+                ├── <span class="folder">📂 src/main/java/.../</span><br>
+                │   └── <span class="folder">📂 config/</span><br>
+                │       └── <span class="highlight">SecurityConfig.java</span><br>
+                ├── <span class="folder">📂 src/main/resources/</span><br>
+                │   └── <span class="folder">📂 templates/</span><br>
+                │       └── <span class="highlight">login.html</span><br>
+                └── <span class="file">Dockerfile</span>
+              </div>
+            </div>
+
+            <div class="callout success mt-3">
+              <strong>¡Semana 8 completa!</strong> Tu app ahora tiene seguridad, campos inteligentes, y puedes mantenerla en producción con confianza.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Semana 8 — Seguridad, QA y Mantenimiento · Programación I · Universidad Rafael Landívar</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    if (window.hljs) hljs.highlightAll();
+    if (window.tippy) tippy('[data-tippy-content]', { theme: 'light', maxWidth: 280 });
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+
+    /* Quiz */
+    const answers = { q1: 'b', q2: 'b', q3: 'a', q4: 'b', q5: 'b' };
+    const explanations = {
+      q1: 'Al agregar la dependencia sin configurar nada, Spring Security protege TODAS las rutas. Genera un usuario "user" y una contraseña aleatoria en la consola.',
+      q2: '@Transient indica a JPA que ese campo no se persiste en la base de datos. Se calcula dinámicamente cada vez que se accede al getter.',
+      q3: 'defaultSuccessUrl("/recursos", true) redirige al usuario a /recursos después de un login exitoso. El "true" fuerza esta URL siempre.',
+      q4: 'Un setter con transformación modifica el valor antes de almacenarlo. Por ejemplo, trim() quita espacios y toUpperCase() convierte a mayúsculas.',
+      q5: 'Render usa zero-downtime deploy: si el build falla, la versión anterior sigue activa. Tu app nunca se cae por un build fallido.'
+    };
+
+    function checkQuiz() {
+      let score = 0;
+      for (const [q, correct] of Object.entries(answers)) {
+        const sel = document.querySelector(`input[name="${q}"]:checked`);
+        const fb = document.getElementById('fb' + q.slice(1));
+        fb.style.display = 'block';
+        if (sel && sel.value === correct) {
+          score++;
+          fb.className = 'quiz-feedback callout success';
+          fb.innerHTML = `<strong>✅ Correcto.</strong> ${explanations[q]}`;
+        } else {
+          fb.className = 'quiz-feedback callout danger';
+          fb.innerHTML = `<strong>❌ Incorrecto.</strong> ${explanations[q]}`;
+        }
+      }
+      const result = document.getElementById('quizResult');
+      result.style.display = 'block';
+      if (score === 5) {
+        result.className = 'callout success mt-3';
+        result.innerHTML = `<strong>🎉 ${score}/5 — ¡Perfecto!</strong> Dominas seguridad, getters calculados y redeploy.`;
+      } else if (score >= 3) {
+        result.className = 'callout mt-3';
+        result.innerHTML = `<strong>👍 ${score}/5 — Bien.</strong> Revisa los temas marcados en rojo.`;
+      } else {
+        result.className = 'callout warning mt-3';
+        result.innerHTML = `<strong>📖 ${score}/5 — Necesitas repasar.</strong> Vuelve a leer las secciones anteriores.`;
+      }
+    }
+
+    /* Checklist */
+    document.querySelectorAll('#checklistItems input').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const total = document.querySelectorAll('#checklistItems input').length;
+        const done = document.querySelectorAll('#checklistItems input:checked').length;
+        document.getElementById('checklistProgress').textContent = `${done} / ${total} completos`;
+        document.getElementById('checklistBar').style.width = `${(done / total) * 100}%`;
+        const emoji = document.getElementById('checklistEmoji');
+        if (done === total) emoji.textContent = '🎉';
+        else if (done > total / 2) emoji.textContent = '💪';
+        else emoji.textContent = '🔒';
+      });
+    });
+  </script>
+</body>
+</html>
